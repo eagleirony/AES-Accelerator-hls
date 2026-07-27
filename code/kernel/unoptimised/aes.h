@@ -24,17 +24,19 @@
 /** @brief The dimension of the square AES state matrix (4x4). */
 #define AES_STATE_DIM 4
 
+#define AES_128 0
+#define AES_192 1
+#define AES_256 2
+
+#define AES_VERSION AES_128
+
 // Number of rounds for each key size.
-#define AES_ROUNDS_128 10
-#define AES_ROUNDS_192 12
-#define AES_ROUNDS_256 14
-#define AES_ROUNDS AES_ROUNDS_256
+#define AES_ROUNDS_SIZES (size_t[]){10, 12, 14}
+#define AES_ROUNDS AES_ROUNDS_SIZES[AES_VERSION]
 
 // Key size for each key size
-#define AES_KEY_SIZE_128 16
-#define AES_KEY_SIZE_192 24
-#define AES_KEY_SIZE_256 32
-#define AES_KEY_SIZE AES_KEY_SIZE_256
+#define AES_KEY_SIZES (size_t[]){16, 24, 32}
+#define AES_KEY_SIZE AES_KEY_SIZES[AES_VERSION]
 
 
 /* ============================================================================
