@@ -36,6 +36,7 @@
 
 // Key size for each key size
 #define AES_KEY_SIZES (size_t[]){16, 24, 32}
+#define AES_KEY_SIZE AES_KEY_SIZES[AES_VERSION]
 
 
 /* ============================================================================
