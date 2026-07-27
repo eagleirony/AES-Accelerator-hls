@@ -226,13 +226,13 @@ static void cipher_encrypt_block(aes_state_t* state, const uint8_t* expanded_key
     add_round_key(state, expanded_key + (AES_BLOCK_SIZE * num_rounds));
 }
 
-void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* key, size_t key_size)
+void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* key)
 {
 
     size_t  expanded_key_size = (size_t)AES_BLOCK_SIZE * (AES_ROUNDS + 1);
     uint8_t expanded_key[AES_BLOCK_SIZE * (AES_ROUNDS + 1)];
 
-    aes_expand_key(expanded_key, key, key_size, expanded_key_size);
+    aes_expand_key(expanded_key, key, AES_KEY_SIZE, expanded_key_size);
 
     aes_state_t state;
     for (int r = 0; r < AES_STATE_DIM; ++r)
