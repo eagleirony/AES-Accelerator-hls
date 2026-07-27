@@ -102,7 +102,8 @@ static void get_round_key(uint8_t *key, uint16_t round) {
     uint8_t temp_word[WORD_SIZE];
     for (size_t i = 0; i < AES_BLOCK_SIZE; i+=WORD_SIZE) {
         if (current_size < AES_KEY_SIZE) {
-            return;
+            current_size+=WORD_SIZE;
+            continue;
         }
         for (size_t i = 0; i < WORD_SIZE; i++) {
             temp_word[i] = key[(current_size - WORD_SIZE + i)%AES_KEY_SIZE];
