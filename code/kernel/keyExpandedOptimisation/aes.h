@@ -28,15 +28,21 @@
 #define AES_192 1
 #define AES_256 2
 
-#define AES_VERSION AES_128
+#define AES_VERSION AES_192
 
-// Number of rounds for each key size.
-#define AES_ROUNDS_SIZES (size_t[]){10, 12, 14}
-#define AES_ROUNDS AES_ROUNDS_SIZES[AES_VERSION]
-
-// Key size for each key size
-#define AES_KEY_SIZES (size_t[]){16, 24, 32}
-#define AES_KEY_SIZE AES_KEY_SIZES[AES_VERSION]
+#if AES_VERSION == AES_128 
+    #define AES_ROUNDS 10
+    #define AES_KEY_SIZE 16
+#elif AES_VERSION == AES_192 
+    #define AES_ROUNDS 12
+    #define AES_KEY_SIZE 24
+#elif AES_VERSION == AES_256 
+    #define AES_ROUNDS 14
+    #define AES_KEY_SIZE 32
+#else 
+    #define AES_ROUNDS 0
+    #define AES_KEY_SIZE 0
+#endif 
 
 
 /* ============================================================================
@@ -50,7 +56,8 @@ typedef uint8_t aes_state_t[AES_STATE_DIM][AES_STATE_DIM];
  * Public API
  * ========================================================================= */
 
-void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* key);
+void aes_encrypt(const uint8_t * plaintext, uint8_t * ciphertext,
+                 const uint8_t * key);
 
 
-#endif // AES_H
+#endif  // AES_H

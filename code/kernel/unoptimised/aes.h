@@ -28,7 +28,7 @@
 #define AES_192 1
 #define AES_256 2
 
-#define AES_VERSION AES_128
+#define AES_VERSION AES_192
 
 // Number of rounds for each key size.
 #define AES_ROUNDS_SIZES (size_t[]){10, 12, 14}

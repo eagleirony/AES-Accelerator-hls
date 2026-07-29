@@ -14,9 +14,7 @@
 
 #include "aes.h"
 
-#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 // Internal constants for the AES implementation.
@@ -97,28 +95,28 @@ static void key_schedule_core(uint8_t * word, uint8_t iteration) {
 //This function keeps the key buffer up to date by modifying the section for the upcoming round
 //It also moves the pointer round_key to the start of the 128 byte section needed
 static void get_round_key(uint8_t *key, uint16_t round) {
-    size_t current_size = round * AES_BLOCK_SIZE;
-    uint8_t rcon_iteration = current_size / AES_KEY_SIZE;
+    uint16_t current_size = round * AES_BLOCK_SIZE;
     uint8_t temp_word[WORD_SIZE];
-    for (size_t i = 0; i < AES_BLOCK_SIZE; i+=WORD_SIZE) {
+    for (uint16_t i = 0; i < AES_BLOCK_SIZE; i+=WORD_SIZE) {
         if (current_size < AES_KEY_SIZE) {
             current_size+=WORD_SIZE;
             continue;
         }
-        for (size_t i = 0; i < WORD_SIZE; i++) {
+        for (uint16_t i = 0; i < WORD_SIZE; i++) {
             temp_word[i] = key[(current_size - WORD_SIZE + i)%AES_KEY_SIZE];
         }
-        if (current_size % (size_t)AES_KEY_SIZE == 0) {
-            key_schedule_core(temp_word, rcon_iteration++);
+        if (current_size % (uint16_t)AES_KEY_SIZE == 0) {
+            uint8_t rcon_iteration = current_size / AES_KEY_SIZE;
+            key_schedule_core(temp_word, rcon_iteration);
         }
-
-        if (AES_KEY_SIZE == AES_KEY_SIZES[AES_256] &&
-            (current_size % (size_t)AES_KEY_SIZE) == AES_BLOCK_SIZE) {
-            for (size_t i = 0; i < WORD_SIZE; i++) {
+#if AES_VERSION == AES_256
+        if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
+            for (uint16_t i = 0; i < WORD_SIZE; i++) {
                 temp_word[i] = sbox[temp_word[i]];
             }
         }
-        for (size_t i = 0; i < WORD_SIZE; i++) {
+#endif
+        for (uint16_t i = 0; i < WORD_SIZE; i++) {
             key[current_size%AES_KEY_SIZE] =
                 key[current_size%AES_KEY_SIZE] ^ temp_word[i];
             current_size++;
@@ -208,21 +206,18 @@ static void add_round_key(aes_state_t * state, const uint8_t * round_key, const 
 }
 
 static void cipher_encrypt_block(aes_state_t *state, uint8_t * key) {
-    uint16_t round = 0;
-    add_round_key(state, key, round);
-    round++;
-    uint8_t *round_key;
-    for (; round < AES_ROUNDS; round++) {
+    add_round_key(state, key, 0);
+    for (uint16_t round = 1; round < AES_ROUNDS; round++) {
+        get_round_key(key, round);
         sub_bytes(state);
         shift_rows(state);
         mix_columns(state);
-        get_round_key(key, round);
         add_round_key(state, key, round);
     }
+    get_round_key(key, AES_ROUNDS);
     sub_bytes(state);
     shift_rows(state);
-    get_round_key(key, round);
-    add_round_key(state, key, round);
+    add_round_key(state, key, AES_ROUNDS);
 }
 
 void aes_encrypt(const uint8_t * plaintext, uint8_t * ciphertext,
