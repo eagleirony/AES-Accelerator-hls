@@ -28,7 +28,9 @@
 #define AES_192 1
 #define AES_256 2
 
-#define AES_VERSION AES_192
+#ifndef AES_VERSION
+#define AES_VERSION AES_256
+#endif
 
 #if AES_VERSION == AES_128 
     #define AES_ROUNDS 10

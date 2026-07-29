@@ -5,15 +5,17 @@
 #include <time.h>
 #include <openssl/evp.h>
 
+//clang software_test.c ../code/kernel/keyExpandedOptimisation/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192
+
 #include "../code/kernel/keyExpandedOptimisation/aes.h"
-#define KEYSIZEBYTES 24
+#define KEYSIZEBYTES AES_KEY_SIZE
 int main() {
     srand(time(NULL));
     for (int j = 0; j < 42;j++) {
     uint8_t ciphertextOut[16];
     uint8_t ciphertextIn[16];
     uint8_t plaintextIn[16];
-    uint8_t keyIn[KEYSIZEBYTES];
+    uint8_t keyIn[AES_KEY_SIZE];
     int inputlen = 16;
     int outputlen;
     int templen = 0;
@@ -25,7 +27,13 @@ int main() {
     }
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_set_padding(ctx, 0);
+#if AES_VERSION == AES_128
+    EVP_EncryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, keyIn, NULL);
+#elif AES_VERSION == AES_192
     EVP_EncryptInit_ex(ctx, EVP_aes_192_ecb(), NULL, keyIn, NULL);
+#elif AES_VERSION == AES_256
+    EVP_EncryptInit_ex(ctx, EVP_aes_256_ecb(), NULL, keyIn, NULL);
+#endif
     EVP_EncryptUpdate(ctx, ciphertextIn, &outputlen, plaintextIn, inputlen);
     EVP_EncryptFinal_ex(ctx, ciphertextIn+outputlen, &templen);
     EVP_CIPHER_CTX_free(ctx);
