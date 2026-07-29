@@ -8,7 +8,6 @@
 //clang software_test.c ../code/kernel/keyExpandedOptimisation/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192
 
 #include "../code/kernel/keyExpandedOptimisation/aes.h"
-#define KEYSIZEBYTES AES_KEY_SIZE
 int main() {
     srand(time(NULL));
     for (int j = 0; j < 42;j++) {
@@ -22,7 +21,7 @@ int main() {
     for (int i = 0; i < 16; i++) {
         plaintextIn[i] = rand() & 0xFF;
     }
-    for (int i = 0; i < KEYSIZEBYTES;i++) {
+    for (int i = 0; i < AES_KEY_SIZE;i++) {
         keyIn[i] = rand() & 0xFF;
     }
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
