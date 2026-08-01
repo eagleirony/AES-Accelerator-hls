@@ -13,21 +13,23 @@
  */
 
 #include "aes.h"
-#include "lookuptable.h"
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "lookuptable.h"
 
 // Internal constants for the AES implementation.
 #define BITS_PER_BYTE 8
 #define WORD_SIZE 4
 
-
 // This function keeps the key buffer up to date by modifying the section for
 // the upcoming round It also moves the pointer round_key to the start of the
 // 128 byte section needed
 static void get_round_key(uint8_t * key, uint16_t round) {
-generate_key:    for (uint16_t current_size = round * AES_BLOCK_SIZE;
+#pragma HLS function_instantiate variable = round
+generate_key:
+    for (uint16_t current_size = round * AES_BLOCK_SIZE;
          current_size < round * AES_BLOCK_SIZE + AES_BLOCK_SIZE;
          current_size += WORD_SIZE) {
 #pragma HLS unroll
@@ -40,7 +42,8 @@ generate_key:    for (uint16_t current_size = round * AES_BLOCK_SIZE;
 #pragma HLS unroll
             temp_word[i] = key[(current_size - WORD_SIZE + i) % AES_KEY_SIZE];
         }
-key_size_sbox:        if (current_size % (uint16_t)AES_KEY_SIZE == 0) {
+    key_size_sbox:
+        if (current_size % (uint16_t)AES_KEY_SIZE == 0) {
             uint8_t rcon_iteration = current_size / AES_KEY_SIZE;
             uint8_t temp = sbox[temp_word[0]];
             temp_word[0] = sbox[temp_word[1]] ^ rcon[rcon_iteration];
@@ -49,14 +52,16 @@ key_size_sbox:        if (current_size % (uint16_t)AES_KEY_SIZE == 0) {
             temp_word[3] = temp;
         }
 #if AES_VERSION == AES_256
-key_block_sbox:        if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
+    key_block_sbox:
+        if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
             for (uint16_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
                 temp_word[i] = sbox[temp_word[i]];
             }
         }
 #endif
-key_update:        for (uint16_t i = 0; i < WORD_SIZE; i++) {
+    key_update:
+        for (uint16_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
             key[(current_size + i) % AES_KEY_SIZE] =
                 key[(current_size + i) % AES_KEY_SIZE] ^ temp_word[i];
@@ -65,7 +70,7 @@ key_update:        for (uint16_t i = 0; i < WORD_SIZE; i++) {
 }
 
 static void shift_rows_and_sub_bytes(aes_state_t * state) {
-    //Row 0: 0-byte left shift
+    // Row 0: 0-byte left shift
     (*state)[0][0] = sbox[(*state)[0][0]];
     (*state)[0][1] = sbox[(*state)[0][1]];
     (*state)[0][2] = sbox[(*state)[0][2]];
@@ -97,28 +102,30 @@ static void shift_rows_and_sub_bytes(aes_state_t * state) {
 
 static void mix_columns(aes_state_t * state) {
     uint8_t t[AES_STATE_DIM];
-mix_columns_outer:    for (int c = 0; c < AES_STATE_DIM; ++c) {
+mix_columns_outer:
+    for (int c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
-mix_columns_outer_inner:         for (int r = 0; r < AES_STATE_DIM; ++r) {
+    mix_columns_outer_inner:
+        for (int r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
             t[r] = (*state)[r][c];
         }
 
         (*state)[0][c] = galois2[t[0]] ^ galois3[t[1]] ^ t[2] ^ t[3];
-        (*state)[1][c] =
-            t[0] ^ galois2[t[1]] ^ galois3[t[2]] ^ t[3];
-        (*state)[2][c] =
-            t[0] ^ t[1] ^ galois2[t[2]] ^ galois3[t[3]];
-        (*state)[3][c] =
-            galois3[t[0]] ^ t[1] ^ t[2] ^ galois2[t[3]];
+        (*state)[1][c] = t[0] ^ galois2[t[1]] ^ galois3[t[2]] ^ t[3];
+        (*state)[2][c] = t[0] ^ t[1] ^ galois2[t[2]] ^ galois3[t[3]];
+        (*state)[3][c] = galois3[t[0]] ^ t[1] ^ t[2] ^ galois2[t[3]];
     }
 }
 
 static void add_round_key(aes_state_t * state, const uint8_t * round_key,
                           const uint16_t round) {
-key_xor:    for (int c = 0; c < AES_STATE_DIM; ++c) {
+#pragma HLS function_instantiate variable = round
+key_xor:
+    for (int c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
-key_xor_inner:        for (int r = 0; r < AES_STATE_DIM; ++r) {
+    key_xor_inner:
+        for (int r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
             (*state)[r][c] ^=
                 round_key[(round * AES_BLOCK_SIZE + (c * AES_STATE_DIM + r)) %
@@ -129,8 +136,9 @@ key_xor_inner:        for (int r = 0; r < AES_STATE_DIM; ++r) {
 
 static void cipher_encrypt_block(aes_state_t * state, uint8_t * key) {
     add_round_key(state, key, 0);
-round_loop:    for (uint16_t round = 1; round < AES_ROUNDS; round++) {
-#pragma HLS pipeline
+round_loop:
+    for (uint16_t round = 1; round < AES_ROUNDS; round++) {
+#pragma HLS pipeline II = 1
         get_round_key(key, round);
         shift_rows_and_sub_bytes(state);
         mix_columns(state);
@@ -144,24 +152,29 @@ round_loop:    for (uint16_t round = 1; round < AES_ROUNDS; round++) {
 void aes_encrypt(const uint8_t * plaintext, uint8_t * ciphertext,
                  const uint8_t * key) {
     aes_state_t state;
-mutable_plaintext:    for (int r = 0; r < AES_STATE_DIM; ++r) {
+mutable_plaintext:
+    for (int r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
-mutable_plaintext_inner:        for (int c = 0; c < AES_STATE_DIM; ++c) {
+    mutable_plaintext_inner:
+        for (int c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
             state[r][c] = plaintext[r + AES_STATE_DIM * c];
         }
     }
 
     uint8_t changing_key[AES_KEY_SIZE];
-mutable_key:    for (int b = 0; b < AES_KEY_SIZE; ++b) {
+mutable_key:
+    for (int b = 0; b < AES_KEY_SIZE; ++b) {
 #pragma HLS unroll
         changing_key[b] = key[b];
     }
     cipher_encrypt_block(&state, changing_key);
 
-copy_out_ciphertext:    for (int r = 0; r < AES_STATE_DIM; ++r) {
+copy_out_ciphertext:
+    for (int r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
-copy_out_ciphertext_inner:        for (int c = 0; c < AES_STATE_DIM; ++c) {
+    copy_out_ciphertext_inner:
+        for (int c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
             ciphertext[r + AES_STATE_DIM * c] = state[r][c];
         }
