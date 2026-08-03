@@ -80,7 +80,7 @@ static void key_schedule_core(uint8_t* word, uint8_t iteration)
 
 void aes_expand_key(uint8_t* expanded_key, const uint8_t* key, size_t key_size, size_t expanded_key_size)
 {
-    size_t  current_size   = key_size;
+    size_t  current_size   = (size_t)key_size;
     uint8_t rcon_iteration = 1;
     uint8_t temp_word[WORD_SIZE];
 
@@ -101,7 +101,7 @@ void aes_expand_key(uint8_t* expanded_key, const uint8_t* key, size_t key_size, 
             key_schedule_core(temp_word, rcon_iteration++);
         }
 
-        if (AES_VERSION == AES_256 && (current_size % (size_t)key_size) == AES_BLOCK_SIZE)
+        if (AES_VERSION == AES_256 && ((current_size % (size_t)key_size) == AES_BLOCK_SIZE))
         {
             for (size_t i = 0; i < WORD_SIZE; i++)
             {
