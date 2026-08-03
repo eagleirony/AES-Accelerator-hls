@@ -81,7 +81,8 @@ int main(int argc, char** argv) {
         key_files = key_files_128;
         output_files = output_files_128;
     } else {
-        std::cout << "ERROR: Invalid AES Version {valid versions are \"AES_128\", \"AES_192\" or \"AES_256\"}\n";
+        std::cout << "ERROR: Invalid AES Version {valid versions are" <<
+            "\"AES_128\", \"AES_192\" or \"AES_256\"}\n";
     }
     aes_key_size = AES_KEY_SIZES[aes_version_id];
     num_tests = NUM_TEST_SIZES[aes_version_id];
@@ -99,9 +100,12 @@ int main(int argc, char** argv) {
     auto krnl = xrt::kernel(device, uuid, "aes");
 
     std::cout << "Allocate Buffer in Global Memory\n";
-    auto buf_in = xrt::bo(device, sizeof(uint8_t) * AES_INPUT_SIZE, krnl.group_id(0));
-    auto buf_out = xrt::bo(device, sizeof(uint8_t) * AES_INPUT_SIZE, krnl.group_id(1));
-    auto buf_key = xrt::bo(device, sizeof(uint8_t) * aes_key_size, krnl.group_id(2));
+    auto buf_in = xrt::bo(device, sizeof(uint8_t) * AES_INPUT_SIZE,
+        krnl.group_id(0));
+    auto buf_out = xrt::bo(device, sizeof(uint8_t) * AES_INPUT_SIZE,
+        krnl.group_id(1));
+    auto buf_key = xrt::bo(device, sizeof(uint8_t) * aes_key_size,
+        krnl.group_id(2));
 
 
     // Map the contents of the buffer object into host memory
@@ -115,18 +119,16 @@ int main(int argc, char** argv) {
 
     // now run all tests for the given AES version
     for (int j = 0; j < num_tests; j++) {
-        std::cout << "*******************************************\n";
-        std::cout << "***  Test: " << j << "  ***\n";
-        std::cout << "*******************************************\n";
+        std::cout << "Test (" << j << "): ";
 
         // open the test files
         FILE *input_fd = fopen(input_files[j],"rb+");
-		FILE *key_fd = fopen(key_files[j], "rb+");
-		FILE *output_fd = fopen(output_files[j], "rb+");
+        FILE *key_fd = fopen(key_files[j], "rb+");
+        FILE *output_fd = fopen(output_files[j], "rb+");
         if (input_fd == NULL || key_fd == NULL || output_fd == NULL) {
-			std::cout << "ERROR: file(s) not opened successfully\n";
-			return EXIT_FAILURE;
-		}
+            std::cout << "  ERROR: file(s) not opened successfully\n";
+            return EXIT_FAILURE;
+        }
 
         size_t r = 0;
         uint8_t golden_output[AES_BLOCK_SIZE];
@@ -136,16 +138,19 @@ int main(int argc, char** argv) {
         // read the key from the key binary file
         r = fread(buf_key_map, sizeof(uint8_t), aes_key_size, key_map);
         if (r != aes_key_size) {
-            std::cout << "ERROR: Issue reading the key\n";
+            std::cout << "  ERROR: Issue reading the key\n";
             return EXIT_FAILURE;
         }
         // synchronise the key_buffer
         buf_key.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
         // continually read in data from the input binary file
-        do {
+        while (true) {
             // read from input file, append 0s at the end
             r = fread(buf_in_map, sizeof(uint8_t), AES_BLOCK_SIZE, input_fd);
+            if (r == 0) {
+                break;
+            }
             if (r < AES_BLOCK_SIZE) {
                 // PKCS#7 Padding : padded bytes == the number of bytes padded on
                 uint8_t padding = AES_BLOCK_SIZE - r;
@@ -181,24 +186,23 @@ int main(int argc, char** argv) {
 
             for (int i = 0; i < AES_BLOCK_SIZE; i++) {
                 if (buf_out_map[i] != golden_output[i]) {
-                    std::cout << "*******************************************\n";
-					std::cout << "FAIL: Output in test " << j << " DOES NOT match the golden output\n";
-					std::cout << "*******************************************\n";
+                    std::cout << "FAIL: Output in test " << j
+                        << " DOES NOT match the golden output" << std::endl;
                     return EXIT_FAILURE;
                 }
             }
 
-        } while (r > 0)
+        }
 
         double average_time = (test_running_time * 1.0) / (test_kernel_accesses * 1.0);
+        std::cout << "SUCCESS: Output matches" << std::endl;
+        std::cout << "Test (" << j << ") report:" << std::endl;
+        std::cout << "  Test Run Time (ns): " << test_running_time << std::endl;
+        std::cout << "  Kernel Accesses: " << test_kernel_accesses << std::endl;
+        std::cout << "  Average Kernel Run Time: " << average_time << std::endl
+            << std::endl;
 
         // at the end of the test, close the fds and print run time and kernel accesses
-        std::cout << "----------------------------\n";
-        std::cout << "End of Test " << j << ":\n";
-        std::cout << "\tTest Run Time (ns): " << test_running_time;
-        std::cout << "\tKernel Accesses: " << test_kernel_accesses;
-        std::cout << "\tAverage Kernel Run Time: " << average_time;
-        std::cout << "----------------------------\n";
 
         total_running_time += test_running_time;
         total_kernel_accesses += test_kernel_accesses;
@@ -211,15 +215,15 @@ int main(int argc, char** argv) {
     double average_time = (total_running_time * 1.0) / (total_kernel_accesses * 1.0);
 
     // at this point, all of the tests have passed
-    std::cout << "*******************************************\n";
-	std::cout << "SUCCESS: Outputs in all tests match the golden outputs\n";
-    std::cout << "Success in AES Version" << aes_version << "\n";
-    std::cout << "----------------------------\n";
-    std::cout << "\tTotal Run Time (ns): " << total_running_time;
-    std::cout << "\tKernel Accesses: " << total_kernel_accesses;
-    std::cout << "\tAverage Kernel Run Time: " << average_time;
-    std::cout << "----------------------------\n";
-	std::cout << "*******************************************\n";
+    std::cout << "*******************************************" << std::endl;
+    std::cout << "SUCCESS: Outputs in all tests match the golden outputs" << std::endl;
+    std::cout << "Success in AES Version" << aes_version << std::endl;
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "  Total Run Time (ns): " << total_running_time << std::endl;
+    std::cout << "  Kernel Accesses: " << total_kernel_accesses << std::endl;
+    std::cout << "  Average Kernel Run Time: " << average_time << std::endl;
+    std::cout << "----------------------------" << std::endl;
+    std::cout << "*******************************************" << std::endl;
 
     return 0;
 }

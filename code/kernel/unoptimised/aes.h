@@ -28,7 +28,7 @@
 #define AES_192 1
 #define AES_256 2
 
-#define AES_VERSION AES_192
+#define AES_VERSION AES_256
 
 // Number of rounds for each key size.
 #define AES_ROUNDS_SIZES (size_t[]){10, 12, 14}
@@ -51,6 +51,5 @@ typedef uint8_t aes_state_t[AES_STATE_DIM][AES_STATE_DIM];
  * ========================================================================= */
 
 void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* key);
-
 
 #endif // AES_H

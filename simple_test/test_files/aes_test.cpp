@@ -7,11 +7,15 @@ OUTPUT:
 
 */
 
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include<iostream>
+#include <iostream>
+#include <iomanip>
 #include <math.h>
+
+extern "C" {
 #include "aes.h"
+}
 
 #define MAX_FILE_NAME_LEN 256
 
@@ -88,6 +92,12 @@ int main()
 		// step 1: read the key
 		r_in = fread(key, sizeof(uint8_t), AES_KEY_SIZE, key_fd);
 
+		std::cout << "AES Key: ";
+		for (int i = 0; i < AES_KEY_SIZE; i++) {
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint32_t)key[i];
+		}
+		std::cout << std::endl;
+
 		// step 2: now, we continually read from input and check that the aes encryption matches the read output
 		r_in = fread(input_stream, sizeof(uint8_t), AES_BLOCK_SIZE, input_fd);
 		if (r_in < AES_BLOCK_SIZE) {
@@ -98,7 +108,18 @@ int main()
 		
 		while (r_in > 0) {
 			// 1. run aes_encrypt on the input and plaintext
-			aes_encrypt(input_stream, output_stream, key);
+			::aes_encrypt(input_stream, output_stream, key);
+
+			std::cout << " Input: ";
+			for (int i = 0; i < AES_BLOCK_SIZE; i++) {
+				std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint32_t)input_stream[i];
+			}
+			std::cout << std::endl;
+			std::cout << "Output: ";
+			for (int i = 0; i < AES_BLOCK_SIZE; i++) {
+				std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint32_t)output_stream[i];
+			}
+			std::cout << std::endl;
 
 			// 2. fetch expected output
 			r_out = fread(expected_output, sizeof(uint8_t), AES_BLOCK_SIZE, output_fd);
@@ -134,4 +155,5 @@ int main()
 
 		return 0;
 	}
+	return 0;
 }
