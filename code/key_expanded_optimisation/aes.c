@@ -26,7 +26,7 @@
 // This function keeps the key buffer up to date by modifying the section for
 // the upcoming round It also moves the pointer round_key to the start of the
 // 128 byte section needed
-static void get_round_key(uint8_t * key, uint16_t round) {
+static void get_round_key(uint8_t * key, uint8_t round) {
 #pragma HLS function_instantiate variable = round
 generate_key:
     for (uint8_t current_size = round * AES_BLOCK_SIZE;
@@ -54,7 +54,7 @@ generate_key:
 #if AES_VERSION == AES_256
     key_block_sbox:
         if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
-            for (uint16_t i = 0; i < WORD_SIZE; i++) {
+            for (uint8_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
                 temp_word[i] = sbox[temp_word[i]];
             }
@@ -119,7 +119,7 @@ mix_columns_outer:
 }
 
 static void add_round_key(aes_state_t * state, const uint8_t * round_key,
-                          const uint16_t round) {
+                          const uint8_t round) {
 #pragma HLS function_instantiate variable = round
 key_xor:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
