@@ -84,12 +84,12 @@ void aes_expand_key(uint8_t* expanded_key, const uint8_t* key, size_t key_size, 
     uint8_t rcon_iteration = 1;
     uint8_t temp_word[WORD_SIZE];
 
-    for (size_t i = 0; i < current_size; i++)
+    key_expansion_init: for (size_t i = 0; i < current_size; i++)
     {
         expanded_key[i] = key[i];
     }
 
-    while (current_size < expanded_key_size)
+    key_expansion: while (current_size < expanded_key_size)
     {
         for (size_t i = 0; i < WORD_SIZE; i++)
         {
@@ -120,7 +120,7 @@ void aes_expand_key(uint8_t* expanded_key, const uint8_t* key, size_t key_size, 
 
 static void sub_bytes(aes_state_t* state)
 {
-    for (int r = 0; r < AES_STATE_DIM; ++r)
+    sub_byte: for (int r = 0; r < AES_STATE_DIM; ++r)
     {
         for (int c = 0; c < AES_STATE_DIM; ++c)
         {
@@ -160,7 +160,7 @@ static void shift_rows(aes_state_t* state)
 static uint8_t galois_mul(uint8_t a, uint8_t b)
 {
     uint8_t p = 0;
-    for (int i = 0; i < BITS_PER_BYTE; i++)
+    galois_loop: for (int i = 0; i < BITS_PER_BYTE; i++)
     {
         if (b & 1)
         {
@@ -184,7 +184,7 @@ static uint8_t galois_mul(uint8_t a, uint8_t b)
 static void mix_columns(aes_state_t* state)
 {
     uint8_t t[AES_STATE_DIM];
-    for (int c = 0; c < AES_STATE_DIM; ++c)
+    mix_cols: for (int c = 0; c < AES_STATE_DIM; ++c)
     {
         for (int r = 0; r < AES_STATE_DIM; ++r)
         {
@@ -201,7 +201,7 @@ static void mix_columns(aes_state_t* state)
 
 static void add_round_key(aes_state_t* state, const uint8_t* round_key)
 {
-    for (int c = 0; c < AES_STATE_DIM; ++c)
+    add_rk: for (int c = 0; c < AES_STATE_DIM; ++c)
     {
         for (int r = 0; r < AES_STATE_DIM; ++r)
         {
@@ -214,7 +214,7 @@ static void add_round_key(aes_state_t* state, const uint8_t* round_key)
 static void cipher_encrypt_block(aes_state_t* state, const uint8_t* expanded_key, uint16_t num_rounds)
 {
     add_round_key(state, expanded_key);
-    for (uint16_t round = 1; round < num_rounds; round++)
+    encrypt_block: for (uint16_t round = 1; round < num_rounds; round++)
     {
         sub_bytes(state);
         shift_rows(state);
@@ -235,7 +235,7 @@ void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* k
     aes_expand_key(expanded_key, key, AES_KEY_SIZE, expanded_key_size);
 
     aes_state_t state;
-    for (int r = 0; r < AES_STATE_DIM; ++r)
+    copy_input: for (int r = 0; r < AES_STATE_DIM; ++r)
     {
         for (int c = 0; c < AES_STATE_DIM; ++c)
         {
@@ -245,7 +245,7 @@ void aes_encrypt(const uint8_t* plaintext, uint8_t* ciphertext, const uint8_t* k
 
     cipher_encrypt_block(&state, expanded_key, AES_ROUNDS);
 
-    for (int r = 0; r < AES_STATE_DIM; ++r)
+    copy_output: for (int r = 0; r < AES_STATE_DIM; ++r)
     {
         for (int c = 0; c < AES_STATE_DIM; ++c)
         {
