@@ -7,7 +7,7 @@
 
 //clang software_test.c ../code/kernel/keyExpandedOptimisation/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192
 
-#include "../code/kernel/keyExpandedOptimisation/aes.h"
+#include "../code/kernel/unoptimised/aes.h"
 int main() {
     srand(time(NULL));
     for (int j = 0; j < 42;j++) {
@@ -40,7 +40,9 @@ int main() {
     for (int i = 0; i < 16; i++) {
         if (ciphertextOut[i] != ciphertextIn[i]) {
             printf("%x : %x\n", ciphertextOut[i], ciphertextIn[i]);
+            return 1;
         }
     }
 }
+printf("Exited successfully\n");
 }
