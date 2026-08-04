@@ -5,12 +5,13 @@
 #include <time.h>
 #include <openssl/evp.h>
 
-//clang software_test.c ../code/kernel/keyExpandedOptimisation/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192
+//clang software_test.c ../code/key_expanded_optimisation/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192 -O3
+//clang software_test.c ../code/unoptimised/aes.c -o out -lssl -lcrypto -D AES_VERSION=AES_192 -O3
 
-#include "../code/kernel/unoptimised/aes.h"
+#include "../code/key_expanded_optimisation/aes.h"
 int main() {
     srand(time(NULL));
-    for (int j = 0; j < 42;j++) {
+    for (int j = 0; j < 1000000;j++) {
     uint8_t ciphertextOut[16];
     uint8_t ciphertextIn[16];
     uint8_t plaintextIn[16];
