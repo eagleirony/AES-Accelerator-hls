@@ -28,7 +28,7 @@
 // 128 byte section needed
 static void get_round_key(uint8_t * key, uint8_t round) {
 #pragma HLS function_instantiate variable = round
-generate_key:
+key_expansion:
     for (uint8_t current_size = round * AES_BLOCK_SIZE;
          current_size < round * AES_BLOCK_SIZE + AES_BLOCK_SIZE;
          current_size += WORD_SIZE) {
@@ -102,10 +102,9 @@ static void shift_rows_and_sub_bytes(aes_state_t * state) {
 
 static void mix_columns(aes_state_t * state) {
     uint8_t t[AES_STATE_DIM];
-mix_columns_outer:
+mix_cols:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
-    mix_columns_outer_inner:
         for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
             t[r] = (*state)[r][c];
@@ -121,10 +120,9 @@ mix_columns_outer:
 static void add_round_key(aes_state_t * state, const uint8_t * round_key,
                           const uint8_t round) {
 #pragma HLS function_instantiate variable = round
-key_xor:
+add_rk:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
-    key_xor_inner:
         for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
             (*state)[r][c] ^=
@@ -137,7 +135,7 @@ key_xor:
 static void cipher_encrypt_block(aes_state_t * state, uint8_t * key) {
 #pragma HLS pipeline II = 1
     add_round_key(state, key, 0);
-round_loop:
+encrypt_block:
     for (uint8_t round = 1; round < AES_ROUNDS; round++) {
 #pragma HLS unroll
         get_round_key(key, round);
@@ -153,11 +151,10 @@ round_loop:
 void aes_encrypt(const uint8_t * plaintext, uint8_t * ciphertext,
                  const uint8_t * key) {
     aes_state_t state;
-    #pragma HLS array_partition variable=state type=complete
-mutable_plaintext:
+#pragma HLS array_partition variable = state type = complete
+copy_input:
     for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
-    mutable_plaintext_inner:
         for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
             state[r][c] = plaintext[r + AES_STATE_DIM * c];
@@ -165,18 +162,17 @@ mutable_plaintext:
     }
 
     uint8_t changing_key[AES_KEY_SIZE];
-    #pragma HLS array_partition variable=changing_key type=complete
-mutable_key:
+#pragma HLS array_partition variable = changing_key type = complete
+copy_key:
     for (uint8_t b = 0; b < AES_KEY_SIZE; ++b) {
 #pragma HLS unroll
         changing_key[b] = key[b];
     }
     cipher_encrypt_block(&state, changing_key);
 
-copy_out_ciphertext:
+copy_output:
     for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
 #pragma HLS unroll
-    copy_out_ciphertext_inner:
         for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
             ciphertext[r + AES_STATE_DIM * c] = state[r][c];
