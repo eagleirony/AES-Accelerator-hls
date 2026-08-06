@@ -1,9 +1,9 @@
 # AES-128 Accelerator - COMP4601
 
 # Project Updates
-Current Version: [v1.1](./Project_Updates.md#-version-1.1)
+Current Version: [v2.1](./Project_Updates.md#-version-2.1)
 
-Last Updated Version: 30/07/2026
+Last Updated Version: 03/08/2026
 
 # Project Contributors
 
