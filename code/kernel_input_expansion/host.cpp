@@ -30,7 +30,7 @@
 #define NUM_TEST_SIZES (int[]) {NUM_TESTS_128, NUM_TESTS_192, NUM_TESTS_256}
 #define NUM_TESTS_128 1
 #define NUM_TESTS_192 1
-#define NUM_TESTS_256 1
+#define NUM_TESTS_256 2
 
 int aes_version_id = AES_256;
 size_t aes_key_size = AES_KEY_SIZES[aes_version_id];
@@ -123,21 +123,26 @@ int main(int argc, char** argv) {
 
         long input_size;
 
+        fseek(input_fd, 0, SEEK_END);
+
         if (apk == "max") {
             // get the size of the input file to give us the size of inputs
-            fseek(input_fd, 0, SEEK_END);
             input_size = ftell(input_fd);
             if (input_size < 0) {
                 std::cout << "  ERROR: Issue with getting file size" << std::endl;
                 return EXIT_FAILURE;
             }
-            fseek(input_fd, 0, SEEK_SET);
         } else {
             // if we have defined an integer number of AES blocks to input, chnge input size to tht
             input_size = stoi(apk) * AES_BLOCK_SIZE;
+            if (ftell(input_fd) < input_size) {
+                input_size = ftell(input_fd);
+            }
         }
         int padding = input_size % AES_BLOCK_SIZE;
         long output_size = input_size + padding;
+
+        fseek(input_fd, 0, SEEK_SET);
 
         std::cout << "Allocate Buffer in Global Memory\n";
         auto buf_in = xrt::bo(device, sizeof(uint8_t) * input_size, krnl.group_id(0));
@@ -177,7 +182,7 @@ int main(int argc, char** argv) {
             // execute the kernel
             auto start = std::chrono::steady_clock::now();
             
-            auto run = krnl(buf_in, input_size, buf_out, buf_key);
+            auto run = krnl(buf_in, r, buf_out, buf_key);
             run.wait();
 
             auto end = std::chrono::steady_clock::now();
@@ -190,6 +195,12 @@ int main(int argc, char** argv) {
             // sync the output buffer and compare to golden output
             buf_out.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
 
+            if (r != input_size) {
+                // assumes this is the last operation, its fine to change output_size
+                int padding = r % AES_BLOCK_SIZE;
+                output_size = r + padding;
+            }
+
             // for the output size, continually check against expected AES_BLOCKS
             for (int i = 0; i < output_size; i += AES_BLOCK_SIZE) {
                 r = fread(golden_output, sizeof(uint8_t), AES_BLOCK_SIZE, output_fd);
@@ -198,7 +209,7 @@ int main(int argc, char** argv) {
                     return EXIT_FAILURE;
                 }
 
-                for (int j = 0; j < output_size; j++) {
+                for (int j = 0; j < AES_BLOCK_SIZE; j++) {
                     if (buf_out_map[i+j] != golden_output[j]) {
                         std::cout << "FAIL: Output in test " << test
                             << " DOES NOT match the golden output" << std::endl;
