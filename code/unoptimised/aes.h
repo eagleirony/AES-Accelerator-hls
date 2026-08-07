@@ -29,7 +29,7 @@
 #define AES_256 2
 
 #ifndef AES_VERSION
-#define AES_VERSION AES_192
+#define AES_VERSION AES_256
 #endif
 
 #if AES_VERSION == AES_128 

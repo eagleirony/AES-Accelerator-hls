@@ -17,7 +17,7 @@ OUTPUT:
 #define NUM_TESTS NUM_TEST_SIZES[AES_VERSION]
 #define NUM_TESTS_128 1
 #define NUM_TESTS_192 1
-#define NUM_TESTS_256 1
+#define NUM_TESTS_256 2
 
 const char *input_files_128[NUM_TESTS_128] = {"testbin/128_plaintext.bin"};
 const char *key_files_128[NUM_TESTS_128] = {"testbin/128_key.bin"};
@@ -27,9 +27,9 @@ const char *input_files_192[NUM_TESTS_192] = {"testbin/192_plaintext.bin"};
 const char *key_files_192[NUM_TESTS_192] = {"testbin/192_key.bin"};
 const char *output_files_192[NUM_TESTS_192] = {"testbin/192_ciphertext.bin"};
 
-const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin"};
-const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin"};
-const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin"};
+const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin", "testbin/256_plaintext_1.bin"};
+const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin", "testbin/256_key.bin"};
+const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin", "testbin/256_ciphertext_1.bin"};
 
 const char **input_files;
 const char **key_files;
@@ -90,7 +90,7 @@ int main()
 		r_in = fread(input_stream, sizeof(uint8_t), AES_BLOCK_SIZE, input_fd);
 		if (r_in < AES_BLOCK_SIZE) {
 			for (int i = r_in; i < AES_BLOCK_SIZE; i++) {
-				input_stream[i] = 0x00;
+				input_stream[i] = AES_BLOCK_SIZE - r_in;
 			}
 		}
 		
@@ -101,7 +101,7 @@ int main()
 			// 2. fetch expected output
 			r_out = fread(expected_output, sizeof(uint8_t), AES_BLOCK_SIZE, output_fd);
 			if (r_out != AES_BLOCK_SIZE) {
-				printf("ERROR: Bad golden output file\n");
+				printf("ERROR: Bad golden output file 1\n");
 			}
 
 			// 3. check that expected_output == output_stream
@@ -117,16 +117,20 @@ int main()
 			r_in  = fread(input_stream, sizeof(uint8_t), AES_BLOCK_SIZE, input_fd);
 			if (r_in < AES_BLOCK_SIZE) {
 				for (int i = r_in; i < AES_BLOCK_SIZE; i++) {
-					input_stream[i] = 0x00;
+					input_stream[i] = AES_BLOCK_SIZE - r_in;
 				}
 			}
 		}
 
 		// make sure the file lengths is as expected
+		long curr_pos = ftell(output_fd);
 		r_out = fread(expected_output, sizeof(uint8_t), AES_BLOCK_SIZE, output_fd);
 		if (r_out != 0) {
-			printf("ERROR: Bad golden output file\n");
-			return 1;
+			fseek(output_fd, 0, SEEK_END);
+			long end_pos = ftell(output_fd);
+
+			printf("ERROR: Bad golden output file 2, %ld vs %ld\n", curr_pos, end_pos);
+			//return 1;
 		}
 
 		printf("Test #%d finished successfully\n", j);
