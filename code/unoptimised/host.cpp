@@ -30,7 +30,7 @@
 #define NUM_TEST_SIZES (int[]) {NUM_TESTS_128, NUM_TESTS_192, NUM_TESTS_256}
 #define NUM_TESTS_128 1
 #define NUM_TESTS_192 1
-#define NUM_TESTS_256 1
+#define NUM_TESTS_256 2
 
 int aes_version_id = AES_256;
 size_t aes_key_size = AES_KEY_SIZES[aes_version_id];
@@ -44,9 +44,9 @@ const char *input_files_192[NUM_TESTS_192] = {"testbin/192_plaintext.bin"};
 const char *key_files_192[NUM_TESTS_192] = {"testbin/192_key.bin"};
 const char *output_files_192[NUM_TESTS_192] = {"testbin/192_ciphertext.bin"};
 
-const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin"};
-const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin"};
-const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin"};
+const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin", "testbin/256_plaintext_1.bin"};
+const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin", "testbin/256_key.bin"};
+const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin", "testbin/256_ciphertext_1.bin"};
 
 const char **input_files;
 const char **key_files;
