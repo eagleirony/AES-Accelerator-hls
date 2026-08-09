@@ -9,6 +9,7 @@
 
 import argparse
 import sys
+import time
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 
@@ -48,7 +49,9 @@ def main():
     try:
         cipher = AES.new(key_data, AES.MODE_ECB)
         padded_data = pad(plaintext_data, AES.block_size, style='pkcs7')
+        start_time = time.perf_counter()
         ciphertext = cipher.encrypt(padded_data)
+        end_time = time.perf_counter()
         
         # 5. Save the result
         with open(args.output, "wb") as f:
@@ -56,6 +59,7 @@ def main():
             
         print(f"Success! Encrypted file saved to: {args.output}")
         print(f"Detected AES mode variant based on key length: AES-{key_length * 8}")
+        print(f"Executed encryption in time: {(end_time - start_time):.6f} seconds")
 
     except Exception as e:
         print(f"Encryption failed: {e}", file=sys.stderr)
