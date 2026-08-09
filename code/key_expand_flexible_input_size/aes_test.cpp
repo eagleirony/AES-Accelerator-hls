@@ -88,7 +88,7 @@ int main()
 
 		// step 2: now we read the entirity of the input file, first we get the input file size in bytes
 		fseek(input_fd, 0, SEEK_END);
-		long input_size = ftell(input_fd);
+		uint32_t input_size = (uint32_t)ftell(input_fd);
 		if (input_size < 0) {
 			printf("\tERROR: Issue with getting file size\n");
 			tests_failed[test] = 1;

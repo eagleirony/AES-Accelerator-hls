@@ -182,8 +182,8 @@ aes_encrypt_loop:
 #pragma HLS unroll
                 state[r][c] = ((i == (loops << 4)) &&
                                ((c * AES_STATE_DIM + r) >= extraBlocks))
-                                  ? plaintext[i + c * AES_STATE_DIM + r]
-                                  : diff;
+                                  ? diff
+                                  : plaintext[i + c * AES_STATE_DIM + r];
             }
         }
 
