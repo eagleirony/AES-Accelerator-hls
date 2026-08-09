@@ -148,76 +148,61 @@ encrypt_block:
     add_round_key(state, key, AES_ROUNDS);
 }
 
-void aes_encrypt_block(aes_state_t state,
-                 const uint8_t * key) {
-
-    uint8_t changing_key[AES_KEY_SIZE];
-#pragma HLS array_partition variable = changing_key type = complete
-copy_key:
-    for (uint8_t b = 0; b < AES_KEY_SIZE; ++b) {
-#pragma HLS unroll
-        changing_key[b] = key[b];
-    }
-    cipher_encrypt_block(&state, changing_key);
-}
-
-void aes_encrypt(const uint8_t* plaintext, const int size, uint8_t* ciphertext, const uint8_t* key) {
-#pragma HLS array_partition variable=sbox type=complete
-#pragma HLS bind_storage variable=sbox type=ROM_NP impl=LUTRAM
-#pragma HLS array_partition variable=galois2 type=complete
-#pragma HLS bind_storage variable=galois2 type=ROM_NP impl=LUTRAM
-#pragma HLS array_partition variable=galois3 type=complete
-#pragma HLS bind_storage variable=galois3 type=ROM_NP impl=LUTRAM
-#pragma HLS array_partition variable=rcon type=complete
-#pragma HLS bind_storage variable=rcon type=ROM_NP impl=LUTRAM
+void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
+                 uint8_t * ciphertext, const uint8_t * key) {
+#pragma HLS array_partition variable = sbox type = complete
+#pragma HLS bind_storage variable = sbox type = ROM_NP impl = LUTRAM
+#pragma HLS array_partition variable = galois2 type = complete
+#pragma HLS bind_storage variable = galois2 type = ROM_NP impl = LUTRAM
+#pragma HLS array_partition variable = galois3 type = complete
+#pragma HLS bind_storage variable = galois3 type = ROM_NP impl = LUTRAM
+#pragma HLS array_partition variable = rcon type = complete
+#pragma HLS bind_storage variable = rcon type = ROM_NP impl = LUTRAM
 
 
     // instantiate arrays for input/output
-    //  perhaps create an array of in_out_states to create memory elements for unrolling the encrypt loop?
-    aes_state_t in_out_state;
+    //  perhaps create an array of in_out_states to create memory elements for
+    //  unrolling the encrypt loop?
+uint32_t loops = size >> 4;
+uint32_t extraBlocks = (size & 0b1111);
+uint32_t diff = AES_BLOCK_SIZE - extraBlocks;
 
-    aes_encrypt_loop:
-    for (int i = 0; i < size; i += AES_BLOCK_SIZE) {
-        #pragma HLS unroll factor=16
-        #pragma HLS pipeline II=1
-        aes_state_t state = in_out_state;
+aes_encrypt_loop:
+    for (uint32_t i = 0; i < size; i += AES_BLOCK_SIZE) {
+// #pragma HLS unroll factor = AES_BLOCK_SIZE
+#pragma HLS pipeline II = 1
+        aes_state_t state;
+#pragma HLS array_partition variable = state type = complete
 
-        // populate input array with PKCS#7 padding
-        populate_input_arr:
-        for (uint8_t c = 0; c < AES_STATE_DIM && (i + c * AES_STATE_DIM + r) < size; c++) {
-            #pragma HLS unroll
-            for (uint8_t r = 0; r < AES_STATE_DIM && (i + c * AES_STATE_DIM + r) < size; r++) {
-                #pragma HLS unroll
-                state[r][c] = plaintext[i + c * AES_STATE_DIM + r];
+    // populate input array with PKCS#7 padding
+    populate_input_arr:
+        for (uint8_t c = 0; c < AES_STATE_DIM; c++) {
+#pragma HLS unroll factor = AES_STATE_DIM
+            for (uint8_t r = 0; r < AES_STATE_DIM; r++) {
+#pragma HLS unroll factor = AES_STATE_DIM
+                state[r][c] = ((i  == (loops << 4)) && ((c * AES_STATE_DIM + r) >= extraBlocks))
+                    ? plaintext[i + c * AES_STATE_DIM + r] : diff;
             }
         }
 
-        pad_input:
-        if (i + AES_BLOCK_SIZE > size) {
-            uint8_t diff = i + AES_BLOCK_SIZE - size;
-            uint8_t min_col = (size - i) / AES_STATE_DIM; 
-            uint8_t min_row = (size - i) % AES_STATE_DIM;
-
-            for (uint8_t c = min_col; c < AES_STATE_DIM; c++) {
-                #pragma HLS unroll
-                for (uint8_t r = min_row; r < AES_STATE_DIM; r++) {
-                    #pragma HLS unroll
-                    state[r][c] = diff;
-                    min_row = 0;
-                }
-            }
+        uint8_t changing_key[AES_KEY_SIZE];
+#pragma HLS array_partition variable = changing_key type = complete
+    copy_key:
+        for (uint8_t b = 0; b < AES_KEY_SIZE; ++b) {
+#pragma HLS unroll factor = AES_KEY_SIZE
+            changing_key[b] = key[b];
         }
 
         // call aes_encrypt_block
-        aes_encrypt_block(state, key);
+        cipher_encrypt_block(&state, changing_key);
 
-        // store output array in ciphertext
-        populate_output_arr:
+    // store output array in ciphertext
+    populate_output_arr:
         for (uint8_t c = 0; c < AES_STATE_DIM; c++) {
-            #pragma HLS unroll
-            for (uint r = 0; r < AES_STATE_DIM; r++)
-                #pragma HLS unroll
-            ciphertest[i + c * AES_STATE_DIM + r] = state[r][c];
+#pragma HLS unroll
+            for (uint8_t r = 0; r < AES_STATE_DIM; r++)
+#pragma HLS unroll
+                ciphertext[i + c * AES_STATE_DIM + r] = state[r][c];
         }
     }
 }
