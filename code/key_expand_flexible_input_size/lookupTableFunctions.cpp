@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "lookupTableFunctions.h"
 uint8_t sbox(uint8_t input) {
 switch (input) {
 case 0:
@@ -513,6 +514,8 @@ case 254:
  return 0xbb;
 case 255:
  return 0x16;
+default:
+return 0;
 }}
 uint8_t galois2(uint8_t input) {
 switch (input) {
@@ -1028,6 +1031,8 @@ case 254:
  return 0xe7;
 case 255:
  return 0xe5;
+default:
+return 0;
 }}
 uint8_t galois3(uint8_t input) {
 switch (input) {
@@ -1543,6 +1548,8 @@ case 254:
  return 0x19;
 case 255:
  return 0x1a;
+default:
+return 0;
 }}
 uint8_t rcon(uint8_t input) {
 switch (input) {
@@ -1578,4 +1585,6 @@ case 14:
  return 0x4d;
 case 15:
  return 0x9a;
+default:
+return 0;
 }}

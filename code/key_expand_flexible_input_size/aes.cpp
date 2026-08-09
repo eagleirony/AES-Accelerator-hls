@@ -31,11 +31,10 @@ static void get_round_key(uint8_t * key, uint8_t round) {
 key_expansion:
     for (uint8_t current_size = round * AES_BLOCK_SIZE, counter = 0;
          counter < AES_BLOCK_SIZE;
-         current_size += WORD_SIZE, counter+= WORD_SIZE) {
+         current_size += WORD_SIZE, counter += WORD_SIZE) {
 #pragma HLS unroll
         uint8_t temp_word[WORD_SIZE];
         if (current_size < AES_KEY_SIZE) {
-            current_size += WORD_SIZE;
             continue;
         }
         for (uint8_t i = 0; i < WORD_SIZE; i++) {
@@ -150,7 +149,7 @@ encrypt_block:
 
 void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
                  uint8_t * ciphertext, const uint8_t * key) {
-#pragma HLS array_partition variable = sbox type = complete
+#pragma HLS array_partition variable = sboxOld type = complete
 #pragma HLS bind_storage variable = sbox type = ROM_NP impl = LUTRAM
 #pragma HLS array_partition variable = galois2 type = complete
 #pragma HLS bind_storage variable = galois2 type = ROM_NP impl = LUTRAM
