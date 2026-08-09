@@ -30,7 +30,7 @@
 #define NUM_TEST_SIZES (int[]) {NUM_TESTS_128, NUM_TESTS_192, NUM_TESTS_256}
 #define NUM_TESTS_128 1
 #define NUM_TESTS_192 1
-#define NUM_TESTS_256 2
+#define NUM_TESTS_256 6
 
 int aes_version_id = AES_256;
 size_t aes_key_size = AES_KEY_SIZES[aes_version_id];
@@ -44,9 +44,30 @@ const char *input_files_192[NUM_TESTS_192] = {"testbin/192_plaintext.bin"};
 const char *key_files_192[NUM_TESTS_192] = {"testbin/192_key.bin"};
 const char *output_files_192[NUM_TESTS_192] = {"testbin/192_ciphertext.bin"};
 
-const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin", "testbin/256_plaintext_1.bin"};
-const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin", "testbin/256_key.bin"};
-const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin", "testbin/256_ciphertext_1.bin"};
+const char *input_files_256[NUM_TESTS_256] = {
+    "testbin/256_plaintext.bin",
+    "testbin/256_plaintext_1.bin",
+    "testbin/256_plaintext_2.bin",
+    "testbin/256_plaintext_3.bin",
+    "testbin/256_plaintext_4.bin",
+    "testbin/256_plaintext_5.bin"
+};
+const char *key_files_256[NUM_TESTS_256] = {
+    "testbin/256_key.bin",
+    "testbin/256_key.bin",
+    "testbin/256_key.bin",
+    "testbin/256_key.bin",
+    "testbin/256_key.bin",
+    "testbin/256_key.bin"
+};
+const char *output_files_256[NUM_TESTS_256] = {
+    "testbin/256_ciphertext.bin",
+    "testbin/256_ciphertext_1.bin",
+    "testbin/256_ciphertext_2.bin", 
+    "testbin/256_ciphertext_3.bin",
+    "testbin/256_ciphertext_4.bin",
+    "testbin/256_ciphertext_5.bin"
+};
 
 const char **input_files;
 const char **key_files;
@@ -116,6 +137,7 @@ int main(int argc, char** argv) {
     // kernel access timing objects
     uint64_t total_running_time = 0;
     uint64_t total_kernel_accesses = 0;
+    uint64_t total_bytes = 0;
 
     // now run all tests for the given AES version
     for (int j = 0; j < num_tests; j++) {
@@ -206,10 +228,14 @@ int main(int argc, char** argv) {
         }
 
         double average_time = (test_running_time * 1.0) / (test_kernel_accesses * 1.0);
+        uint64_t input_size = ftell(input_fd);
+        total_bytes += input_size;
         std::cout << "SUCCESS: Output matches" << std::endl;
+        std::cout << "  Test size (MB / Bytes): " << (double)input_size / 1000000 << " / " << input_size << std::endl;
         std::cout << "  Test Run Time (ms): " << test_running_time / 1000000 << std::endl;
         std::cout << "  Kernel Accesses: " << test_kernel_accesses << std::endl;
-        std::cout << "  Average Kernel Run Time (ns): " << average_time  << std::endl
+        std::cout << "  Average Kernel Run Time (ns): " << average_time  << std::endl;
+        std::cout << "  MB/sec: " << input_size / ((double)test_running_time / 1000)
             << std::endl;
 
         // at the end of the test, close the fds and print run time and kernel accesses
@@ -232,6 +258,8 @@ int main(int argc, char** argv) {
     std::cout << "  Total Run Time (ms): " << total_running_time / 1000000 << std::endl;
     std::cout << "  Kernel Accesses: " << total_kernel_accesses << std::endl;
     std::cout << "  Average Kernel Run Time (ns): " << average_time << std::endl;
+    std::cout << "  MB/sec: " << total_bytes / ((double)total_running_time / 1000)
+        << std::endl;
     std::cout << "----------------------------" << std::endl;
     std::cout << "*******************************************" << std::endl;
 
