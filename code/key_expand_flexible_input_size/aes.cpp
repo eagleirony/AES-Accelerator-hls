@@ -202,12 +202,15 @@ aes_encrypt_loop:
         cipher_encrypt_block(&state, changing_key);
 
     // store output array in ciphertext
+    uint8_t ciphertext_precopy[AES_BLOCK_SIZE];
+    #pragma HLS array_partition variable = ciphertext_precopy type = complete
     populate_output_arr:
         for (uint8_t c = 0; c < AES_STATE_DIM; c++) {
 #pragma HLS unroll
             for (uint8_t r = 0; r < AES_STATE_DIM; r++)
 #pragma HLS unroll
-                ciphertext[i + c * AES_STATE_DIM + r] = state[r][c];
+                ciphertext_precopy[c * AES_STATE_DIM + r] = state[r][c];
         }
+        memcpy(&ciphertext[i], ciphertext_precopy, AES_BLOCK_SIZE);
     }
 }
