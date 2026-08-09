@@ -4,8 +4,8 @@
 #include "lookuptable.h"
 
 #define SIZE_OF_ARRAY 256
-#define ARRAY sboxOld
-#define FUNCTION_NAME sbox
+#define ARRAY galois3Old
+#define FUNCTION_NAME galois3
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -29,8 +29,9 @@ int main() {
         }
     }
     fprintf(output, "bits[%d] = 0;\nbreak;\n", j); 
-    fprintf(output, "}\nreturn_value |= bits[%d] << %d;\n", j, j);
+    fprintf(output, "}\n");
 }
+    fprintf(output, "return_value = (bits[0] << 0) | (bits[1] << 1) | (bits[2] << 2) | (bits[3] << 3) | (bits[4] << 4) | (bits[5] << 5) | (bits[6] << 6) | (bits[7] << 7);\n");
     fprintf(output, "return return_value;\n}\n");
     fclose(output);
 }
