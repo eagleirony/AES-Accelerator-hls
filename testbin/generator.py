@@ -1,5 +1,5 @@
 # Python 3 file for generating golden output. 
-# ECB mode, padds with zeros
+# ECB mode, padding is PKCS#7
 # Example usage: 
 #   source myenv/bin/activate
 #   python3 generator.py -p 192_plaintext.bin -k 192_key.bin -o test_out.bin
@@ -10,15 +10,7 @@
 import argparse
 import sys
 from Crypto.Cipher import AES
-
-def pad_zero(data: bytes, block_size: int = 16) -> bytes:
-    """Pads data with trailing zeros to match the block size boundary."""
-    pad_len = block_size - (len(data) % block_size)
-    if pad_len == block_size:
-        print(f"no padding needed for data {data}")
-        return data
-    print(f"padded data: {data} with {pad_len} bytes")
-    return data + b'\x00' * pad_len
+from Crypto.Util.Padding import pad
 
 def main():
     # 1. Setup command line arguments
@@ -55,7 +47,7 @@ def main():
     # 4. Perform padded encryption
     try:
         cipher = AES.new(key_data, AES.MODE_ECB)
-        padded_data = pad_zero(plaintext_data)
+        padded_data = pad(plaintext_data, AES.block_size, style='pkcs7')
         ciphertext = cipher.encrypt(padded_data)
         
         # 5. Save the result
