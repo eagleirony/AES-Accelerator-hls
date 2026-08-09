@@ -29,9 +29,9 @@
 static void get_round_key(uint8_t * key, uint8_t round) {
 #pragma HLS function_instantiate variable = round
 key_expansion:
-    for (uint8_t current_size = round * AES_BLOCK_SIZE;
-         current_size < round * AES_BLOCK_SIZE + AES_BLOCK_SIZE;
-         current_size += WORD_SIZE) {
+    for (uint8_t current_size = round * AES_BLOCK_SIZE, counter = 0;
+         counter < AES_BLOCK_SIZE;
+         current_size += WORD_SIZE, counter+= WORD_SIZE) {
 #pragma HLS unroll
         uint8_t temp_word[WORD_SIZE];
         if (current_size < AES_KEY_SIZE) {
