@@ -58,8 +58,9 @@ typedef uint8_t aes_state_t[AES_STATE_DIM][AES_STATE_DIM];
  * Public API
  * ========================================================================= */
 
-void aes_encrypt(const uint8_t * plaintext, uint8_t * ciphertext,
-                 const uint8_t * key);
+
+void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
+                 uint8_t * ciphertext, const uint8_t * key);
 
 
 #endif  // AES_H
