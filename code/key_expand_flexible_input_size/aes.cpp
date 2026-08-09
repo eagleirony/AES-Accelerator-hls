@@ -32,14 +32,14 @@ key_expansion:
     for (uint8_t current_size = round * AES_BLOCK_SIZE;
          current_size < round * AES_BLOCK_SIZE + AES_BLOCK_SIZE;
          current_size += WORD_SIZE) {
-#pragma HLS unroll factor = AES_BLOCK_SIZE
+#pragma HLS unroll
         uint8_t temp_word[WORD_SIZE];
         if (current_size < AES_KEY_SIZE) {
             current_size += WORD_SIZE;
             continue;
         }
         for (uint8_t i = 0; i < WORD_SIZE; i++) {
-#pragma HLS unroll factor = WORD_SIZE
+#pragma HLS unroll
             temp_word[i] = key[(current_size - WORD_SIZE + i) % AES_KEY_SIZE];
         }
     key_size_sbox:
@@ -55,14 +55,14 @@ key_expansion:
     key_block_sbox:
         if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
             for (uint8_t i = 0; i < WORD_SIZE; i++) {
-#pragma HLS unroll factor = WORD_SIZE
+#pragma HLS unroll
                 temp_word[i] = sbox[temp_word[i]];
             }
         }
 #endif
     key_update:
         for (uint8_t i = 0; i < WORD_SIZE; i++) {
-#pragma HLS unroll factor = WORD_SIZE
+#pragma HLS unroll
             key[(current_size + i) % AES_KEY_SIZE] =
                 key[(current_size + i) % AES_KEY_SIZE] ^ temp_word[i];
         }
@@ -104,9 +104,9 @@ static void mix_columns(aes_state_t * state) {
     uint8_t t[AES_STATE_DIM];
 mix_cols:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
         for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
             t[r] = (*state)[r][c];
         }
 
@@ -122,9 +122,9 @@ static void add_round_key(aes_state_t * state, const uint8_t * round_key,
 #pragma HLS function_instantiate variable = round
 add_rk:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
         for (uint8_t r = 0; r < AES_STATE_DIM; ++r) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
             (*state)[r][c] ^=
                 round_key[(round * AES_BLOCK_SIZE + (c * AES_STATE_DIM + r)) %
                           AES_KEY_SIZE];
@@ -177,9 +177,9 @@ aes_encrypt_loop:
     // populate input array with PKCS#7 padding
     populate_input_arr:
         for (uint8_t c = 0; c < AES_STATE_DIM; c++) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
             for (uint8_t r = 0; r < AES_STATE_DIM; r++) {
-#pragma HLS unroll factor = AES_STATE_DIM
+#pragma HLS unroll
                 state[r][c] = ((i == (loops << 4)) &&
                                ((c * AES_STATE_DIM + r) >= extraBlocks))
                                   ? plaintext[i + c * AES_STATE_DIM + r]
@@ -191,7 +191,7 @@ aes_encrypt_loop:
 #pragma HLS array_partition variable = changing_key type = complete
     copy_key:
         for (uint8_t b = 0; b < AES_KEY_SIZE; ++b) {
-#pragma HLS unroll factor = AES_KEY_SIZE
+#pragma HLS unroll
             changing_key[b] = key[b];
         }
 
