@@ -44,18 +44,18 @@ key_expansion:
     key_size_sbox:
         if (current_size % AES_KEY_SIZE == 0) {
             uint8_t rcon_iteration = current_size / AES_KEY_SIZE;
-            uint8_t temp = sbox[temp_word[0]];
-            temp_word[0] = sbox[temp_word[1]] ^ rcon[rcon_iteration];
-            temp_word[1] = sbox[temp_word[2]];
-            temp_word[2] = sbox[temp_word[3]];
+            uint8_t temp = sbox[(int)temp_word[0]];
+            temp_word[0] = sbox[(int)temp_word[1]] ^ rcon[(int)rcon_iteration];
+            temp_word[1] = sbox[(int)temp_word[2]];
+            temp_word[2] = sbox[(int)temp_word[3]];
             temp_word[3] = temp;
         }
 #if AES_VERSION == AES_256
-    key_block_sbox:
+    key_block_s_box:
         if ((current_size % AES_KEY_SIZE) == AES_BLOCK_SIZE) {
             for (uint8_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
-                temp_word[i] = sbox[temp_word[i]];
+                temp_word[i] = sbox[(int)temp_word[i]];
             }
         }
 #endif
@@ -70,32 +70,32 @@ key_expansion:
 
 static void shift_rows_and_sub_bytes(aes_state_t * state) {
     // Row 0: 0-byte left shift
-    (*state)[0][0] = sbox[(*state)[0][0]];
-    (*state)[0][1] = sbox[(*state)[0][1]];
-    (*state)[0][2] = sbox[(*state)[0][2]];
-    (*state)[0][3] = sbox[(*state)[0][3]];
+    (*state)[0][0] = sbox[(int)(*state)[0][0]];
+    (*state)[0][1] = sbox[(int)(*state)[0][1]];
+    (*state)[0][2] = sbox[(int)(*state)[0][2]];
+    (*state)[0][3] = sbox[(int)(*state)[0][3]];
 
     uint8_t temp;
     // Row 1: 1-byte left shift
-    temp = sbox[(*state)[1][0]];
-    (*state)[1][0] = sbox[(*state)[1][1]];
-    (*state)[1][1] = sbox[(*state)[1][2]];
-    (*state)[1][2] = sbox[(*state)[1][3]];
+    temp = sbox[(int)(*state)[1][0]];
+    (*state)[1][0] = sbox[(int)(*state)[1][1]];
+    (*state)[1][1] = sbox[(int)(*state)[1][2]];
+    (*state)[1][2] = sbox[(int)(*state)[1][3]];
     (*state)[1][3] = temp;
 
     // Row 2: 2-byte left shift
-    uint8_t temp2 = sbox[(*state)[2][0]];
-    (*state)[2][0] = sbox[(*state)[2][2]];
+    uint8_t temp2 = sbox[(int)(*state)[2][0]];
+    (*state)[2][0] = sbox[(int)(*state)[2][2]];
     (*state)[2][2] = temp2;
-    uint8_t temp3 = sbox[(*state)[2][1]];
-    (*state)[2][1] = sbox[(*state)[2][3]];
+    uint8_t temp3 = sbox[(int)(*state)[2][1]];
+    (*state)[2][1] = sbox[(int)(*state)[2][3]];
     (*state)[2][3] = temp3;
 
     // Row 3: 3-byte left shift
-    uint8_t temp4 = sbox[(*state)[3][0]];
-    (*state)[3][0] = sbox[(*state)[3][3]];
-    (*state)[3][3] = sbox[(*state)[3][2]];
-    (*state)[3][2] = sbox[(*state)[3][1]];
+    uint8_t temp4 = sbox[(int)(*state)[3][0]];
+    (*state)[3][0] = sbox[(int)(*state)[3][3]];
+    (*state)[3][3] = sbox[(int)(*state)[3][2]];
+    (*state)[3][2] = sbox[(int)(*state)[3][1]];
     (*state)[3][1] = temp4;
 }
 
@@ -109,10 +109,10 @@ mix_cols:
             t[r] = (*state)[r][c];
         }
 
-        (*state)[0][c] = galois2[t[0]] ^ galois3[t[1]] ^ t[2] ^ t[3];
-        (*state)[1][c] = t[0] ^ galois2[t[1]] ^ galois3[t[2]] ^ t[3];
-        (*state)[2][c] = t[0] ^ t[1] ^ galois2[t[2]] ^ galois3[t[3]];
-        (*state)[3][c] = galois3[t[0]] ^ t[1] ^ t[2] ^ galois2[t[3]];
+        (*state)[0][c] = galois2[(int)t[0]] ^ galois3[(int)t[1]] ^ t[2] ^ t[3];
+        (*state)[1][c] = t[0] ^ galois2[(int)t[1]] ^ galois3[(int)t[2]] ^ t[3];
+        (*state)[2][c] = t[0] ^ t[1] ^ galois2[(int)t[2]] ^ galois3[(int)t[3]];
+        (*state)[3][c] = galois3[(int)t[0]] ^ t[1] ^ t[2] ^ galois2[(int)t[3]];
     }
 }
 
