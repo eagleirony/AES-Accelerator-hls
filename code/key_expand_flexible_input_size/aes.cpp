@@ -159,10 +159,6 @@ void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
 #pragma HLS bind_storage variable = rcon type = ROM_NP impl = LUTRAM
 
 
-#pragma HLS array_partition variable = plaintext type = complete
-#pragma HLS array_partition variable = key type = complete
-#pragma HLS array_partition variable = ciphertext type = complete
-
     // instantiate arrays for input/output
     //  perhaps create an array of in_out_states to create memory elements for
     //  unrolling the encrypt loop?
