@@ -82,12 +82,14 @@ int main(int argc, char** argv) {
     parser.addSwitch("--xclbin_file", "-x", "input binary file string", "");
     parser.addSwitch("--device_id", "-d", "device index", "0");
     parser.addSwitch("--aes_version", "-v", "AES version", "AES_256");
+    parser.addSwitch("--software", "-s", "Run in software only", "");
     parser.parse(argc, argv);
 
     // Read settings
     std::string binaryFile = parser.value("xclbin_file");
     int device_index = stoi(parser.value("device_id"));
     std::string aes_version = parser.value("aes_version");
+    bool software = parser.isValid("software");
 
     // obtain the aes version and set relevant parameters
     if (aes_version == "AES_256") {
@@ -130,9 +132,19 @@ int main(int argc, char** argv) {
 
 
     // Map the contents of the buffer object into host memory
-    auto buf_in_map = buf_in.map<uint8_t*>();
-    auto buf_out_map = buf_out.map<uint8_t*>();
-    auto buf_key_map = buf_key.map<uint8_t*>();
+    uint8_t* buf_in_map;
+    uint8_t* buf_out_map;
+    uint8_t* buf_key_map;
+
+    if (software) {
+        buf_in_map = (uint8_t*)malloc(sizeof(uint8_t) * AES_INPUT_SIZE);
+        buf_out_map = (uint8_t*)malloc(sizeof(uint8_t) * AES_INPUT_SIZE);
+        buf_key_map = (uint8_t*)malloc(sizeof(uint8_t) * AES_INPUT_SIZE);
+    } else {
+        buf_in_map = buf_in.map<uint8_t*>();
+        buf_out_map = buf_out.map<uint8_t*>();
+        buf_key_map = buf_key.map<uint8_t*>();
+    }
 
     // kernel access timing objects
     uint64_t total_running_time = 0;
@@ -163,8 +175,10 @@ int main(int argc, char** argv) {
             std::cout << "  ERROR: Issue reading the key\n";
             return EXIT_FAILURE;
         }
-        // synchronise the key_buffer
-        buf_key.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+        if (!software) {
+            // synchronise the key_buffer
+            buf_key.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+        }
 
         // continually read in data from the input binary file
         while (true) {
@@ -181,14 +195,20 @@ int main(int argc, char** argv) {
                 }
             }
 
-            // synchronise the input buffer
-            buf_in.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+            if (!software) {
+                // synchronise the input buffer
+                buf_in.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+            }
 
             // execute the kernel
             auto start = std::chrono::steady_clock::now();
             
-            auto run = krnl(buf_in, buf_out, buf_key);
-            run.wait();
+            if (software) {
+                aes_encrypt(buf_in_map, buf_out_map, buf_key_map);
+            } else {
+                auto run = krnl(buf_in, buf_out, buf_key);
+                run.wait();
+            }
 
             auto end = std::chrono::steady_clock::now();
 
@@ -197,8 +217,10 @@ int main(int argc, char** argv) {
             test_running_time += elapsed_ns.count();
             test_kernel_accesses++;
 
-            // sync the output buffer and compare to golden output
-            buf_out.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+            if (!software) {
+                // sync the output buffer and compare to golden output
+                buf_out.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+            }
 
             int r_out = fread(golden_output, sizeof(uint8_t), AES_BLOCK_SIZE, output_fd);
             if (r_out != AES_BLOCK_SIZE) {
