@@ -17,7 +17,7 @@ OUTPUT:
 #define NUM_TESTS NUM_TEST_SIZES[AES_VERSION]
 #define NUM_TESTS_128 1
 #define NUM_TESTS_192 1
-#define NUM_TESTS_256 2
+#define NUM_TESTS_256 3
 
 const char *input_files_128[NUM_TESTS_128] = {"testbin/128_plaintext.bin"};
 const char *key_files_128[NUM_TESTS_128] = {"testbin/128_key.bin"};
@@ -27,9 +27,9 @@ const char *input_files_192[NUM_TESTS_192] = {"testbin/192_plaintext.bin"};
 const char *key_files_192[NUM_TESTS_192] = {"testbin/192_key.bin"};
 const char *output_files_192[NUM_TESTS_192] = {"testbin/192_ciphertext.bin"};
 
-const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin", "testbin/256_plaintext_1.bin"};
-const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin", "testbin/256_key.bin"};
-const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin", "testbin/256_ciphertext_1.bin"};
+const char *input_files_256[NUM_TESTS_256] = {"testbin/256_plaintext.bin", "testbin/256_plaintext_1.bin", "testbin/completeWorksOfShakespeare.txt"};
+const char *key_files_256[NUM_TESTS_256] = {"testbin/256_key.bin", "testbin/256_key.bin", "testbin/256_key.bin"};
+const char *output_files_256[NUM_TESTS_256] = {"testbin/256_ciphertext.bin", "testbin/256_ciphertext_1.bin", "testbin/shakespeare.bin"};
 
 const char **input_files;
 const char **key_files;
@@ -71,8 +71,16 @@ int main()
 		FILE *input_fd = fopen(input_files[test],"rb+");
 		FILE *output_fd = fopen(output_files[test], "rb+");
 		FILE *key_fd = fopen(key_files[test], "rb+");
-		if (input_fd == NULL || key_fd == NULL || output_fd == NULL) {
-			printf("\tERROR: File not opened successfully\n");
+		if (input_fd == NULL) {
+			printf("\tERROR: Input File not opened successfully\n");
+			continue;
+		}
+		if (key_fd == NULL) {
+			printf("\tERROR: key File not opened successfully\n");
+			continue;
+		}
+		if (output_fd == NULL) {
+			printf("\tERROR: output File not opened successfully\n");
 			continue;
 		}
 		printf("Files Opened Successfully\n");
