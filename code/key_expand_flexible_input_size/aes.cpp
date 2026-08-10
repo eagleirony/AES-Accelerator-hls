@@ -119,6 +119,7 @@ static const uint8_t rcon[] = {0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
 // the upcoming round It also moves the pointer round_key to the start of the
 // 128 byte section needed
 static void get_round_key(uint8_t * key, uint8_t round) {
+    #pragma HLS inline off
 #pragma HLS function_instantiate variable = round
 key_expansion:
     for (uint8_t current_size = round * AES_BLOCK_SIZE, counter = 0;
@@ -161,6 +162,7 @@ key_expansion:
 }
 
 static void shift_rows_and_sub_bytes(aes_state_t * state) {
+        #pragma HLS inline off
     // Row 0: 0-byte left shift
     (*state)[0][0] = sbox[(*state)[0][0]];
     (*state)[0][1] = sbox[(*state)[0][1]];
@@ -192,6 +194,7 @@ static void shift_rows_and_sub_bytes(aes_state_t * state) {
 }
 
 static void mix_columns(aes_state_t * state) {
+        #pragma HLS inline off
     uint8_t t[AES_STATE_DIM];
 mix_cols:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
@@ -209,6 +212,7 @@ mix_cols:
 }
 
 static void add_round_key(aes_state_t * state, const uint8_t * round_key) {
+        #pragma HLS inline off
 add_rk:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
@@ -221,6 +225,7 @@ add_rk:
 }
 
 static void cipher_encrypt_block(aes_state_t * state, uint8_t * key) {
+        #pragma HLS inline off
 #pragma HLS pipeline II = 1
     add_round_key(state, key);
 encrypt_block:
