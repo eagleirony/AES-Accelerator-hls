@@ -212,7 +212,6 @@ mix_cols:
 }
 
 static void add_round_key(aes_state_t * state, const uint8_t round_key[AES_BLOCK_SIZE]) {
-        #pragma HLS inline off
 add_rk:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
@@ -226,11 +225,12 @@ add_rk:
 
 static void cipher_encrypt_block(aes_state_t * state, uint8_t key[AES_ROUNDS+1][AES_BLOCK_SIZE]) {
         #pragma HLS inline off
-#pragma HLS pipeline II = 1
+#pragma HLS pipeline off
     add_round_key(state, key[0]);
 encrypt_block:
     for (uint8_t round = 1; round < AES_ROUNDS; round++) {
-#pragma HLS unroll
+#pragma HLS unroll off
+#pragma HLS pipeline
         shift_rows_and_sub_bytes(state);
         mix_columns(state);
         add_round_key(state, key[round]);
@@ -261,10 +261,16 @@ void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
         loops +=1;
     }
     uint8_t roundKeys[AES_ROUNDS+1][AES_BLOCK_SIZE];
-    memcpy(roundKeys[0], key, AES_BLOCK_SIZE);
-    memcpy(roundKeys[1], &key[AES_BLOCK_SIZE], AES_KEY_SIZE-AES_BLOCK_SIZE);
+    uint8_t keyin[AES_KEY_SIZE];
     #pragma HLS array_partition variable = roundKeys type = complete
-    for (uint8_t genKeys = 0; genKeys <= AES_ROUNDS; genKeys++) {
+    #pragma HLS array_partition variable = keyin type = complete
+    memcpy(keyin, key, AES_KEY_SIZE);
+    for (uint8_t i = 0; i < AES_KEY_SIZE; i++) {
+        #pragma HLS unroll
+        roundKeys[i >> 4][i % AES_BLOCK_SIZE] = keyin[i];
+    }
+    for (uint8_t genKeys = 1; genKeys <= AES_ROUNDS; genKeys++) {
+        #pragma HLS pipeline off
         get_round_key(roundKeys, genKeys);
     }
 
