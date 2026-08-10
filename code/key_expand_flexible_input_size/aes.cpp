@@ -118,20 +118,21 @@ static const uint8_t rcon[] = {0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
 // This function keeps the key buffer up to date by modifying the section for
 // the upcoming round It also moves the pointer round_key to the start of the
 // 128 byte section needed
-static void get_round_key(uint8_t * key, uint8_t round) {
+static void get_round_key(uint8_t key[AES_ROUNDS+1][AES_BLOCK_SIZE], uint8_t round) {
+    #pragma HLS inline off
 #pragma HLS function_instantiate variable = round
 key_expansion:
     for (uint8_t current_size = round * AES_BLOCK_SIZE, counter = 0;
          counter < AES_BLOCK_SIZE;
          current_size += WORD_SIZE, counter+= WORD_SIZE) {
-#pragma HLS unroll
+//#pragma HLS unroll
         uint8_t temp_word[WORD_SIZE];
         if (current_size < AES_KEY_SIZE) {
             continue;
         }
         for (uint8_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
-            temp_word[i] = key[current_size - WORD_SIZE + i];
+            temp_word[i] = key[(current_size - WORD_SIZE + i) / AES_BLOCK_SIZE][(current_size - WORD_SIZE + i) % AES_BLOCK_SIZE];
         }
     key_size_sbox:
         if (current_size % AES_KEY_SIZE == 0) {
@@ -154,13 +155,14 @@ key_expansion:
     key_update:
         for (uint8_t i = 0; i < WORD_SIZE; i++) {
 #pragma HLS unroll
-            key[current_size + i] =
-                key[current_size + i - AES_KEY_SIZE] ^ temp_word[i];
+            key[round][(current_size + i) % AES_BLOCK_SIZE] =
+                key[(current_size + i - AES_KEY_SIZE) / AES_BLOCK_SIZE][(current_size + i - AES_KEY_SIZE) % AES_BLOCK_SIZE] ^ temp_word[i];
         }
     }
 }
 
 static void shift_rows_and_sub_bytes(aes_state_t * state) {
+        #pragma HLS inline off
     // Row 0: 0-byte left shift
     (*state)[0][0] = sbox[(*state)[0][0]];
     (*state)[0][1] = sbox[(*state)[0][1]];
@@ -192,6 +194,7 @@ static void shift_rows_and_sub_bytes(aes_state_t * state) {
 }
 
 static void mix_columns(aes_state_t * state) {
+        #pragma HLS inline off
     uint8_t t[AES_STATE_DIM];
 mix_cols:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
@@ -208,7 +211,7 @@ mix_cols:
     }
 }
 
-static void add_round_key(aes_state_t * state, const uint8_t * round_key) {
+static void add_round_key(aes_state_t * state, const uint8_t round_key[AES_BLOCK_SIZE]) {
 add_rk:
     for (uint8_t c = 0; c < AES_STATE_DIM; ++c) {
 #pragma HLS unroll
@@ -220,18 +223,20 @@ add_rk:
     }
 }
 
-static void cipher_encrypt_block(aes_state_t * state, uint8_t * key) {
-#pragma HLS pipeline II = 1
-    add_round_key(state, key);
+static void cipher_encrypt_block(aes_state_t * state, uint8_t key[AES_ROUNDS+1][AES_BLOCK_SIZE]) {
+        #pragma HLS inline off
+#pragma HLS pipeline off
+    add_round_key(state, key[0]);
 encrypt_block:
     for (uint8_t round = 1; round < AES_ROUNDS; round++) {
-#pragma HLS unroll
+#pragma HLS unroll off
+#pragma HLS pipeline
         shift_rows_and_sub_bytes(state);
         mix_columns(state);
-        add_round_key(state, &key[round << 4]);
+        add_round_key(state, key[round]);
     }
     shift_rows_and_sub_bytes(state);
-    add_round_key(state, &key[AES_ROUNDS << 4]);
+    add_round_key(state, key[AES_ROUNDS]);
 }
 
 void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
@@ -255,17 +260,24 @@ void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
     if (extraBlocks == 0) {
         loops +=1;
     }
-    uint8_t roundKeys[AES_BLOCK_SIZE * (AES_ROUNDS+1)];
-    memcpy(roundKeys,key, AES_KEY_SIZE);
+    uint8_t roundKeys[AES_ROUNDS+1][AES_BLOCK_SIZE];
+    uint8_t keyin[AES_KEY_SIZE];
     #pragma HLS array_partition variable = roundKeys type = complete
-    for (uint8_t genKeys = 0; genKeys <= AES_ROUNDS; genKeys++) {
+    #pragma HLS array_partition variable = keyin type = complete
+    memcpy(keyin, key, AES_KEY_SIZE);
+    for (uint8_t i = 0; i < AES_KEY_SIZE; i++) {
+        #pragma HLS unroll
+        roundKeys[i >> 4][i % AES_BLOCK_SIZE] = keyin[i];
+    }
+    for (uint8_t genKeys = 1; genKeys <= AES_ROUNDS; genKeys++) {
+        #pragma HLS pipeline off
         get_round_key(roundKeys, genKeys);
     }
 
 aes_encrypt_loop:
     for (uint32_t i = 0; i < size; i += AES_BLOCK_SIZE) {
-// #pragma HLS unroll factor = AES_BLOCK_SIZE
-#pragma HLS pipeline II = 1
+#pragma HLS unroll factor = 4
+#pragma HLS pipeline off
         aes_state_t state;
 #pragma HLS array_partition variable = state type = complete
     uint8_t plaintext_copied[AES_BLOCK_SIZE];
@@ -283,12 +295,6 @@ aes_encrypt_loop:
                                   : plaintext_copied[c * AES_STATE_DIM + r];
             }
         }
-/*    copy_key:
-        for (uint8_t b = 0; b < AES_KEY_SIZE; ++b) {
-#pragma HLS unroll
-            changing_key[b] = key[b];
-        }*/
-
         // call aes_encrypt_block
         cipher_encrypt_block(&state, roundKeys);
 
