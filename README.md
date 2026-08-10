@@ -16,3 +16,9 @@ Last Updated Version: 03/08/2026
 
 # Project Plan
 8 Slide slideshow found [here](./Project_Plan.pdf).
+
+# Project Presentation
+10 slide ppt found NOWHERE.
+
+# Demo Plan
+Found [here](./demo_plan.md).
