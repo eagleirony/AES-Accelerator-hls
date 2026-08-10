@@ -145,14 +145,14 @@ encrypt_block:
 
 void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
                  uint8_t * ciphertext, const uint8_t * key) {
-#pragma HLS array_partition variable = sbox type = complete
+#pragma HLS array_partition variable = sboxOld type = complete
 //#pragma HLS bind_storage variable = sbox type = ROM_NP impl = LUTRAM
-#pragma HLS array_partition variable = galois2 type = complete
+#pragma HLS array_partition variable = galois2Old type = complete
 //#pragma HLS bind_storage variable = galois2 type = ROM_NP impl = LUTRAM
-#pragma HLS array_partition variable = galois3 type = complete
+#pragma HLS array_partition variable = galois3Old type = complete
 //#pragma HLS bind_storage variable = galois3 type = ROM_NP impl = LUTRAM
-#pragma HLS array_partition variable = rcon type = complete
-#pragma HLS bind_storage variable = rcon type = ROM_NP impl = LUTRAM
+#pragma HLS array_partition variable = rconOld type = complete
+#pragma HLS bind_storage variable = rconOld type = ROM_NP impl = LUTRAM
 
 
     // instantiate arrays for input/output
@@ -161,6 +161,9 @@ void aes_encrypt(const uint8_t * plaintext, const uint32_t size,
     uint32_t loops = size >> 4;
     uint32_t extraBlocks = (size & 0b1111);
     uint32_t diff = AES_BLOCK_SIZE - extraBlocks;
+    if (extraBlocks == 0) {
+        loops +=1;
+    }
     uint8_t roundKeys[AES_BLOCK_SIZE * (AES_ROUNDS+1)];
     memcpy(roundKeys,key, AES_KEY_SIZE);
     #pragma HLS array_partition variable = roundKeys type = complete
