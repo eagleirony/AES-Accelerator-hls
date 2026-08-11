@@ -1,0 +1,61 @@
+================================================================
+== Design Size Report
+================================================================
+
+* Total Instructions per Compilation Phase
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+| Phase         | Step                       | Instructions | Description                                                                            |
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+| Compile/Link  |                            |  38,100      | After all functions are compiled and linked into a single design                       |
+|               |                            |              |                                                                                        |
+| Unroll/Inline |                            |              | After user unroll and inline pragmas are applied                                       |
+|               | (1) unroll                 | 233,972 *    | user unroll pragmas are applied                                                        |
+|               | (2) simplification         | 248,988 *    | simplification of applied user unroll pragmas                                          |
+|               | (3) inline                 | 206,381 *    | user inline pragmas are applied                                                        |
+|               | (4) simplification         | 206,368 *    | simplification of applied user inline pragmas                                          |
+|               |                            |              |                                                                                        |
+| Array/Struct  |                            |              | After user array partition and struct aggregate/disaggregate pragmas are applied       |
+|               | (1) array partition        | 216,396 *    | user array partition pragmas are applied                                               |
+|               | (2) simplification         | 206,951 *    | simplification of applied user array partition & struct aggregate/disaggregate pragmas |
+|               | (3) aggregate/disaggregate | 206,951 *    | user struct aggregate/disaggregate pragmas are applied                                 |
+|               | (4) array reshape          | 206,951 *    | apply array reshape pragmas                                                            |
+|               | (5) access patterns        | 206,937 *    | array access pattern optmizations                                                      |
+|               |                            |              |                                                                                        |
+| Performance   |                            |              | After transformations are applied to meet performance pragma targets                   |
+|               | (1) loop simplification    | 206,933 *    | loop and instruction simplification                                                    |
+|               | (2) parallelization        | 205,817 *    | loops are unrolled or pipelined to meet performance targets                            |
+|               | (3) array partition        | 206,183 *    | arrays are partitioned to meet performance targets                                     |
+|               | (4) simplification         | 205,742 *    | simplification of design after performance transformations                             |
+|               |                            |              |                                                                                        |
+| HW Transforms |                            |              | After hardware transfomations                                                          |
+|               | (1) lowering               | 205,779 *    | initial conversion to HW specific instructions                                         |
+|               | (2) optimizations          | 201,990 *    | high level synthesis optimizations                                                     |
++---------------+----------------------------+--------------+----------------------------------------------------------------------------------------+
+    * - Exceeded design size warning message threshold
+
+* Instructions per Function for each Compilation Phase
++------------------------------+-------------------------------+-------------------+--------------------+--------------------+--------------------+--------------------+
+| Function                     | Location                      | Compile/Link      | Unroll/Inline      | Array/Struct       | Performance        | HW Transforms      |
++------------------------------+-------------------------------+-------------------+--------------------+--------------------+--------------------+--------------------+
+| + aes_encrypt                | aes.cpp:150                   | 38,100            | 206,368 *          | 206,937 *          | 205,742 *          | 201,990 *          |
+|  + get_round_key             | aes.cpp:31                    | 6,354             |    834             |  1,234             |  3,208             |  3,197             |
+|     sbox                     | lookupTableFunctions.cpp:184  | 3,375 (5 calls)   |    592 (8 calls)   |    592 (8 calls)   |    592 (8 calls)   |    592 (8 calls)   |
+|     rcon                     | lookupTableFunctions.cpp:3    |   675             |                    |                    |                    |                    |
+|  + cipher_encrypt_block      | aes.cpp:135                   | 29,879            | 204,660 (4 calls)  | 204,660 (4 calls)  | 200,892 (4 calls)  | 197,680 (4 calls)  |
+|     add_round_key            | aes.cpp:124                   | 1,230 (3 calls)   |  5,760 (60 calls)  |  5,820 (60 calls)  |                    |                    |
+|   + shift_rows_and_sub_bytes | aes.cpp:74                    | 22,082 (2 calls)  | 71,736 (56 calls)  | 71,736 (56 calls)  | 70,840 (56 calls)  | 70,896 (56 calls)  |
+|      sbox                    | lookupTableFunctions.cpp:184  | 21,600 (32 calls) | 66,304 (896 calls) | 66,304 (896 calls) | 66,304 (896 calls) | 66,304 (896 calls) |
+|   + mix_columns              | aes.cpp:106                   | 6,440             | 126,932 (52 calls) | 126,932 (52 calls) | 126,100 (52 calls) | 122,824 (52 calls) |
+|      galois2                 | lookupTableFunctions.cpp:2285 | 2,700 (4 calls)   | 57,408 (832 calls) | 57,408 (832 calls) | 57,408 (832 calls) | 57,408 (832 calls) |
+|      galois3                 | lookupTableFunctions.cpp:4386 | 2,700 (4 calls)   | 57,408 (832 calls) | 57,408 (832 calls) | 57,408 (832 calls) | 57,408 (832 calls) |
++------------------------------+-------------------------------+-------------------+--------------------+--------------------+--------------------+--------------------+
+    * - Exceeded design size warning message threshold
+
+* Design Size Message Settings
++---------------------------------------------+--------+------------------------------------------------------------------+
+| Message Setting                             | Value  | Description                                                      |
++---------------------------------------------+--------+------------------------------------------------------------------+
+| config_compile -design_size_maximum_warning | 100000 | Show a warning when total design instructions exceeds this value |
++---------------------------------------------+--------+------------------------------------------------------------------+
+
+

@@ -1,0 +1,258 @@
+
+
+================================================================
+== Vitis HLS Report for 'mix_columns'
+================================================================
+* Date:           Tue Aug 11 14:22:22 2026
+
+* Version:        2025.2 (Build 6295257 on Nov 14 2025)
+* Project:        key_expanded
+* Solution:       hls (Vitis Kernel Flow Target)
+* Product family: zynquplus
+* Target device:  xck26-sfvc784-2LV-c
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+----------+----------+------------+
+    |  Clock |  Target  | Estimated| Uncertainty|
+    +--------+----------+----------+------------+
+    |ap_clk  |  10.00 ns|  1.648 ns|     2.70 ns|
+    +--------+----------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        +-----------------------------------+---------+---------+---------+----------+----------+-----+-----+---------+
+        |                                   |         |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+        |              Instance             |  Module |   min   |   max   |    min   |    max   | min | max |   Type  |
+        +-----------------------------------+---------+---------+---------+----------+----------+-----+-----+---------+
+        |ref_tmp13_assign_6_galois2_fu_136  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp27_assign_6_galois2_fu_142  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp42_assign_6_galois2_fu_148  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp59_assign_6_galois2_fu_154  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp13_assign_5_galois2_fu_160  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp27_assign_5_galois2_fu_166  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp42_assign_5_galois2_fu_172  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp59_assign_5_galois2_fu_178  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp13_assign_4_galois2_fu_184  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp27_assign_4_galois2_fu_190  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp42_assign_4_galois2_fu_196  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp59_assign_4_galois2_fu_202  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp13_assign_3_galois2_fu_208  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp27_assign_3_galois2_fu_214  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp42_assign_3_galois2_fu_220  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp59_assign_3_galois2_fu_226  |galois2  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp15_assign_6_galois3_fu_232  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp30_assign_6_galois3_fu_238  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp45_assign_6_galois3_fu_244  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp54_assign_6_galois3_fu_250  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp54_assign_5_galois3_fu_256  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp15_assign_5_galois3_fu_262  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp30_assign_5_galois3_fu_268  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp45_assign_5_galois3_fu_274  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp54_assign_4_galois3_fu_280  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp15_assign_4_galois3_fu_286  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp30_assign_4_galois3_fu_292  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp45_assign_4_galois3_fu_298  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp54_assign_3_galois3_fu_304  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp15_assign_3_galois3_fu_310  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp30_assign_3_galois3_fu_316  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        |ref_tmp45_assign_3_galois3_fu_322  |galois3  |        0|        0|      0 ns|      0 ns|    1|    1|      yes|
+        +-----------------------------------+---------+---------+---------+----------+----------+-----+-----+---------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+------+--------+--------+-----+
+|       Name      | BRAM_18K|  DSP |   FF   |   LUT  | URAM|
++-----------------+---------+------+--------+--------+-----+
+|DSP              |        -|     -|       -|       -|    -|
+|Expression       |        -|     -|       0|     384|    -|
+|FIFO             |        -|     -|       -|       -|    -|
+|Instance         |        -|     -|       0|    3536|    -|
+|Memory           |        -|     -|       -|       -|    -|
+|Multiplexer      |        -|     -|       -|       -|    -|
+|Register         |        -|     -|       -|       -|    -|
++-----------------+---------+------+--------+--------+-----+
+|Total            |        0|     0|       0|    3920|    0|
++-----------------+---------+------+--------+--------+-----+
+|Available        |      288|  1248|  234240|  117120|   64|
++-----------------+---------+------+--------+--------+-----+
+|Utilization (%)  |        0|     0|       0|       3|    0|
++-----------------+---------+------+--------+--------+-----+
+
++ Detail: 
+    * Instance: 
+    +-----------------------------------+---------+---------+----+---+-----+-----+
+    |              Instance             |  Module | BRAM_18K| DSP| FF| LUT | URAM|
+    +-----------------------------------+---------+---------+----+---+-----+-----+
+    |ref_tmp13_assign_6_galois2_fu_136  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp27_assign_6_galois2_fu_142  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp42_assign_6_galois2_fu_148  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp59_assign_6_galois2_fu_154  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp13_assign_5_galois2_fu_160  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp27_assign_5_galois2_fu_166  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp42_assign_5_galois2_fu_172  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp59_assign_5_galois2_fu_178  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp13_assign_4_galois2_fu_184  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp27_assign_4_galois2_fu_190  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp42_assign_4_galois2_fu_196  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp59_assign_4_galois2_fu_202  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp13_assign_3_galois2_fu_208  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp27_assign_3_galois2_fu_214  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp42_assign_3_galois2_fu_220  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp59_assign_3_galois2_fu_226  |galois2  |        0|   0|  0|   98|    0|
+    |ref_tmp15_assign_6_galois3_fu_232  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp30_assign_6_galois3_fu_238  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp45_assign_6_galois3_fu_244  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp54_assign_6_galois3_fu_250  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp54_assign_5_galois3_fu_256  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp15_assign_5_galois3_fu_262  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp30_assign_5_galois3_fu_268  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp45_assign_5_galois3_fu_274  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp54_assign_4_galois3_fu_280  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp15_assign_4_galois3_fu_286  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp30_assign_4_galois3_fu_292  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp45_assign_4_galois3_fu_298  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp54_assign_3_galois3_fu_304  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp15_assign_3_galois3_fu_310  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp30_assign_3_galois3_fu_316  |galois3  |        0|   0|  0|  123|    0|
+    |ref_tmp45_assign_3_galois3_fu_322  |galois3  |        0|   0|  0|  123|    0|
+    +-----------------------------------+---------+---------+----+---+-----+-----+
+    |Total                              |         |        0|   0|  0| 3536|    0|
+    +-----------------------------------+---------+---------+----+---+-----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +------------------------+----------+----+---+----+------------+------------+
+    |      Variable Name     | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +------------------------+----------+----+---+----+------------+------------+
+    |xor_ln117_10_fu_550_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_11_fu_556_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_1_fu_334_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_2_fu_340_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_3_fu_400_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_4_fu_406_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_5_fu_412_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_6_fu_472_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_7_fu_478_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_8_fu_484_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_9_fu_544_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln117_fu_328_p2     |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_10_fu_568_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_11_fu_574_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_1_fu_352_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_2_fu_358_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_3_fu_418_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_4_fu_424_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_5_fu_430_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_6_fu_490_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_7_fu_496_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_8_fu_502_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_9_fu_562_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln118_fu_346_p2     |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_10_fu_586_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_11_fu_592_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_1_fu_370_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_2_fu_376_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_3_fu_436_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_4_fu_442_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_5_fu_448_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_6_fu_508_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_7_fu_514_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_8_fu_520_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_9_fu_580_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln119_fu_364_p2     |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_10_fu_604_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_11_fu_610_p2  |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_1_fu_388_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_2_fu_394_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_3_fu_454_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_4_fu_460_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_5_fu_466_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_6_fu_526_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_7_fu_532_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_8_fu_538_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_9_fu_598_p2   |       xor|   0|  0|   8|           8|           8|
+    |xor_ln120_fu_382_p2     |       xor|   0|  0|   8|           8|           8|
+    +------------------------+----------+----+---+----+------------+------------+
+    |Total                   |          |   0|  0| 384|         384|         384|
+    +------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    N/A
+
+    * Register: 
+    N/A
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------+-----+-----+------------+----------------+--------------+
+|    RTL Ports   | Dir | Bits|  Protocol  |  Source Object |    C Type    |
++----------------+-----+-----+------------+----------------+--------------+
+|ap_ready        |  out|    1|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_0     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_1     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_2     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_3     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_4     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_5     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_6     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_7     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_8     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_9     |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_10    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_11    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_12    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_13    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_14    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_return_15    |  out|    8|  ap_ctrl_hs|     mix_columns|  return value|
+|ap_rst          |   in|    1|  ap_ctrl_hs|     mix_columns|  return value|
+|state_0_0_read  |   in|    8|     ap_none|  state_0_0_read|        scalar|
+|state_0_1_read  |   in|    8|     ap_none|  state_0_1_read|        scalar|
+|state_0_2_read  |   in|    8|     ap_none|  state_0_2_read|        scalar|
+|state_0_3_read  |   in|    8|     ap_none|  state_0_3_read|        scalar|
+|state_1_0_read  |   in|    8|     ap_none|  state_1_0_read|        scalar|
+|state_1_1_read  |   in|    8|     ap_none|  state_1_1_read|        scalar|
+|state_1_2_read  |   in|    8|     ap_none|  state_1_2_read|        scalar|
+|state_1_3_read  |   in|    8|     ap_none|  state_1_3_read|        scalar|
+|state_2_0_read  |   in|    8|     ap_none|  state_2_0_read|        scalar|
+|state_2_1_read  |   in|    8|     ap_none|  state_2_1_read|        scalar|
+|state_2_2_read  |   in|    8|     ap_none|  state_2_2_read|        scalar|
+|state_2_3_read  |   in|    8|     ap_none|  state_2_3_read|        scalar|
+|state_3_0_read  |   in|    8|     ap_none|  state_3_0_read|        scalar|
+|state_3_1_read  |   in|    8|     ap_none|  state_3_1_read|        scalar|
+|state_3_2_read  |   in|    8|     ap_none|  state_3_2_read|        scalar|
+|state_3_3_read  |   in|    8|     ap_none|  state_3_3_read|        scalar|
++----------------+-----+-----+------------+----------------+--------------+
+
