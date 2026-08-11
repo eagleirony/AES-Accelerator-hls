@@ -1,14 +1,13 @@
-#include <stdint.h>
+#include <ap_int.h>
 
-uint8_t rcon(uint8_t input) {
-    uint8_t bits[8] = {0};
-    uint8_t return_value = 0;
+ap_uint<8> rcon(ap_uint<4> input) {
+    ap_uint<8> return_value = 0;
     switch (input) {
         case 1:
         case 9:
         case 13:
         case 14:
-            bits[0] = 1;
+            return_value[0]=1;
             break;
         case 0:
         case 2:
@@ -22,7 +21,7 @@ uint8_t rcon(uint8_t input) {
         case 11:
         case 12:
         case 15:
-            bits[0] = 0;
+            return_value[0]=0;
             break;
     }
     switch (input) {
@@ -31,7 +30,7 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 13:
         case 15:
-            bits[1] = 1;
+            return_value[1] = 1;
             break;
         case 0:
         case 1:
@@ -44,7 +43,7 @@ uint8_t rcon(uint8_t input) {
         case 11:
         case 12:
         case 14:
-            bits[1] = 0;
+            return_value[1] = 0;
             break;
     }
     switch (input) {
@@ -52,7 +51,7 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 11:
         case 14:
-            bits[2] = 1;
+            return_value[2] = 1;
             break;
         case 0:
         case 1:
@@ -66,7 +65,7 @@ uint8_t rcon(uint8_t input) {
         case 12:
         case 13:
         case 15:
-            bits[2] = 0;
+            return_value[2] = 0;
             break;
     }
     switch (input) {
@@ -77,7 +76,7 @@ uint8_t rcon(uint8_t input) {
         case 13:
         case 14:
         case 15:
-            bits[3] = 1;
+            return_value[3] = 1;
             break;
         case 0:
         case 1:
@@ -88,7 +87,7 @@ uint8_t rcon(uint8_t input) {
         case 7:
         case 8:
         case 10:
-            bits[3] = 0;
+            return_value[3] = 0;
             break;
     }
     switch (input) {
@@ -97,7 +96,7 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 12:
         case 15:
-            bits[4] = 1;
+            return_value[4] = 1;
             break;
         case 0:
         case 1:
@@ -110,7 +109,7 @@ uint8_t rcon(uint8_t input) {
         case 11:
         case 13:
         case 14:
-            bits[4] = 0;
+            return_value[4] = 0;
             break;
     }
     switch (input) {
@@ -118,7 +117,7 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 11:
         case 13:
-            bits[5] = 1;
+            return_value[5] = 1;
             break;
         case 0:
         case 1:
@@ -132,7 +131,7 @@ uint8_t rcon(uint8_t input) {
         case 12:
         case 14:
         case 15:
-            bits[5] = 0;
+            return_value[5] = 0;
             break;
     }
     switch (input) {
@@ -140,7 +139,7 @@ uint8_t rcon(uint8_t input) {
         case 11:
         case 12:
         case 14:
-            bits[6] = 1;
+            return_value[6] = 1;
             break;
         case 0:
         case 1:
@@ -154,7 +153,7 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 13:
         case 15:
-            bits[6] = 0;
+            return_value[6] = 0;
             break;
     }
     switch (input) {
@@ -162,7 +161,7 @@ uint8_t rcon(uint8_t input) {
         case 12:
         case 13:
         case 15:
-            bits[7] = 1;
+            return_value[7] = 1;
             break;
         case 0:
         case 1:
@@ -176,20 +175,14 @@ uint8_t rcon(uint8_t input) {
         case 10:
         case 11:
         case 14:
-            bits[7] = 0;
+            return_value[7] = 0;
             break;
     }
-    return_value = (bits[0] << 0) | (bits[1] << 1) | (bits[2] << 2) |
-                   (bits[3] << 3) | (bits[4] << 4) | (bits[5] << 5) |
-                   (bits[6] << 6) | (bits[7] << 7);
     return return_value;
 }
 
-#include <stdint.h>
-
-uint8_t sbox(uint8_t input) {
-    uint8_t bits[8] = {0};
-    uint8_t return_value = 0;
+ap_uint<8> sbox(ap_uint<8> input) {
+    ap_uint<8> return_value = 0;
     switch (input) {
         case 0:
         case 2:
@@ -319,7 +312,7 @@ uint8_t sbox(uint8_t input) {
         case 250:
         case 251:
         case 254:
-            bits[0] = 1;
+            return_value[0] = 1;
             break;
         case 1:
         case 4:
@@ -449,7 +442,7 @@ uint8_t sbox(uint8_t input) {
         case 252:
         case 253:
         case 255:
-            bits[0] = 0;
+            return_value[0] = 0;
             break;
     }
     switch (input) {
@@ -581,7 +574,7 @@ uint8_t sbox(uint8_t input) {
         case 251:
         case 254:
         case 255:
-            bits[1] = 1;
+            return_value[1] = 1;
             break;
         case 1:
         case 7:
@@ -711,7 +704,7 @@ uint8_t sbox(uint8_t input) {
         case 250:
         case 252:
         case 253:
-            bits[1] = 0;
+            return_value[1] = 0;
             break;
     }
     switch (input) {
@@ -843,7 +836,7 @@ uint8_t sbox(uint8_t input) {
         case 251:
         case 253:
         case 255:
-            bits[2] = 1;
+            return_value[2] = 1;
             break;
         case 0:
         case 3:
@@ -973,7 +966,7 @@ uint8_t sbox(uint8_t input) {
         case 249:
         case 252:
         case 254:
-            bits[2] = 0;
+            return_value[2] = 0;
             break;
     }
     switch (input) {
@@ -1105,7 +1098,7 @@ uint8_t sbox(uint8_t input) {
         case 250:
         case 251:
         case 254:
-            bits[3] = 1;
+            return_value[3] = 1;
             break;
         case 0:
         case 2:
@@ -1235,7 +1228,7 @@ uint8_t sbox(uint8_t input) {
         case 252:
         case 253:
         case 255:
-            bits[3] = 0;
+            return_value[3] = 0;
             break;
     }
     switch (input) {
@@ -1367,7 +1360,7 @@ uint8_t sbox(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[4] = 1;
+            return_value[4] = 1;
             break;
         case 0:
         case 5:
@@ -1497,7 +1490,7 @@ uint8_t sbox(uint8_t input) {
         case 248:
         case 250:
         case 251:
-            bits[4] = 0;
+            return_value[4] = 0;
             break;
     }
     switch (input) {
@@ -1629,7 +1622,7 @@ uint8_t sbox(uint8_t input) {
         case 250:
         case 252:
         case 254:
-            bits[5] = 1;
+            return_value[5] = 1;
             break;
         case 7:
         case 9:
@@ -1759,7 +1752,7 @@ uint8_t sbox(uint8_t input) {
         case 251:
         case 253:
         case 255:
-            bits[5] = 0;
+            return_value[5] = 0;
             break;
     }
     switch (input) {
@@ -1891,7 +1884,7 @@ uint8_t sbox(uint8_t input) {
         case 247:
         case 248:
         case 253:
-            bits[6] = 1;
+            return_value[6] = 1;
             break;
         case 8:
         case 9:
@@ -2021,7 +2014,7 @@ uint8_t sbox(uint8_t input) {
         case 252:
         case 254:
         case 255:
-            bits[6] = 0;
+            return_value[6] = 0;
             break;
     }
     switch (input) {
@@ -2153,7 +2146,7 @@ uint8_t sbox(uint8_t input) {
         case 249:
         case 252:
         case 254:
-            bits[7] = 1;
+            return_value[7] = 1;
             break;
         case 0:
         case 1:
@@ -2283,20 +2276,14 @@ uint8_t sbox(uint8_t input) {
         case 251:
         case 253:
         case 255:
-            bits[7] = 0;
+            return_value[7] = 0;
             break;
     }
-    return_value = (bits[0] << 0) | (bits[1] << 1) | (bits[2] << 2) |
-                   (bits[3] << 3) | (bits[4] << 4) | (bits[5] << 5) |
-                   (bits[6] << 6) | (bits[7] << 7);
     return return_value;
 }
 
-#include <stdint.h>
-
-uint8_t galois2(uint8_t input) {
-    uint8_t bits[8] = {0};
-    uint8_t return_value = 0;
+ap_uint<8> galois2(ap_uint<8> input) {
+    ap_uint<8> return_value = 0;
     switch (input) {
         case 128:
         case 129:
@@ -2426,7 +2413,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[0] = 1;
+            return_value[0] = 1;
             break;
         case 0:
         case 1:
@@ -2556,7 +2543,7 @@ uint8_t galois2(uint8_t input) {
         case 125:
         case 126:
         case 127:
-            bits[0] = 0;
+            return_value[0] = 0;
             break;
     }
     switch (input) {
@@ -2688,7 +2675,7 @@ uint8_t galois2(uint8_t input) {
         case 250:
         case 252:
         case 254:
-            bits[1] = 1;
+            return_value[1] = 1;
             break;
         case 0:
         case 2:
@@ -2818,7 +2805,7 @@ uint8_t galois2(uint8_t input) {
         case 251:
         case 253:
         case 255:
-            bits[1] = 0;
+            return_value[1] = 0;
             break;
     }
     switch (input) {
@@ -2950,7 +2937,7 @@ uint8_t galois2(uint8_t input) {
         case 251:
         case 254:
         case 255:
-            bits[2] = 1;
+            return_value[2] = 1;
             break;
         case 0:
         case 1:
@@ -3080,7 +3067,7 @@ uint8_t galois2(uint8_t input) {
         case 249:
         case 252:
         case 253:
-            bits[2] = 0;
+            return_value[2] = 0;
             break;
     }
     switch (input) {
@@ -3212,7 +3199,7 @@ uint8_t galois2(uint8_t input) {
         case 249:
         case 250:
         case 251:
-            bits[3] = 1;
+            return_value[3] = 1;
             break;
         case 0:
         case 1:
@@ -3342,7 +3329,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[3] = 0;
+            return_value[3] = 0;
             break;
     }
     switch (input) {
@@ -3474,7 +3461,7 @@ uint8_t galois2(uint8_t input) {
         case 245:
         case 246:
         case 247:
-            bits[4] = 1;
+            return_value[4] = 1;
             break;
         case 0:
         case 1:
@@ -3604,7 +3591,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[4] = 0;
+            return_value[4] = 0;
             break;
     }
     switch (input) {
@@ -3736,7 +3723,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[5] = 1;
+            return_value[5] = 1;
             break;
         case 0:
         case 1:
@@ -3866,7 +3853,7 @@ uint8_t galois2(uint8_t input) {
         case 237:
         case 238:
         case 239:
-            bits[5] = 0;
+            return_value[5] = 0;
             break;
     }
     switch (input) {
@@ -3998,7 +3985,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[6] = 1;
+            return_value[6] = 1;
             break;
         case 0:
         case 1:
@@ -4128,7 +4115,7 @@ uint8_t galois2(uint8_t input) {
         case 221:
         case 222:
         case 223:
-            bits[6] = 0;
+            return_value[6] = 0;
             break;
     }
     switch (input) {
@@ -4260,7 +4247,7 @@ uint8_t galois2(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[7] = 1;
+            return_value[7] = 1;
             break;
         case 0:
         case 1:
@@ -4390,20 +4377,14 @@ uint8_t galois2(uint8_t input) {
         case 189:
         case 190:
         case 191:
-            bits[7] = 0;
+            return_value[7] = 0;
             break;
     }
-    return_value = (bits[0] << 0) | (bits[1] << 1) | (bits[2] << 2) |
-                   (bits[3] << 3) | (bits[4] << 4) | (bits[5] << 5) |
-                   (bits[6] << 6) | (bits[7] << 7);
     return return_value;
 }
 
-#include <stdint.h>
-
-uint8_t galois3(uint8_t input) {
-    uint8_t bits[8] = {0};
-    uint8_t return_value = 0;
+ap_uint<8> galois3(ap_uint<8> input) {
+    ap_uint<8> return_value = 0;
     switch (input) {
         case 1:
         case 3:
@@ -4533,7 +4514,7 @@ uint8_t galois3(uint8_t input) {
         case 250:
         case 252:
         case 254:
-            bits[0] = 1;
+            return_value[0] = 1;
             break;
         case 0:
         case 2:
@@ -4663,7 +4644,7 @@ uint8_t galois3(uint8_t input) {
         case 251:
         case 253:
         case 255:
-            bits[0] = 0;
+            return_value[0] = 0;
             break;
     }
     switch (input) {
@@ -4795,7 +4776,7 @@ uint8_t galois3(uint8_t input) {
         case 251:
         case 252:
         case 255:
-            bits[1] = 1;
+            return_value[1] = 1;
             break;
         case 0:
         case 3:
@@ -4925,7 +4906,7 @@ uint8_t galois3(uint8_t input) {
         case 250:
         case 253:
         case 254:
-            bits[1] = 0;
+            return_value[1] = 0;
             break;
     }
     switch (input) {
@@ -5057,7 +5038,7 @@ uint8_t galois3(uint8_t input) {
         case 251:
         case 252:
         case 253:
-            bits[2] = 1;
+            return_value[2] = 1;
             break;
         case 0:
         case 1:
@@ -5187,7 +5168,7 @@ uint8_t galois3(uint8_t input) {
         case 249:
         case 254:
         case 255:
-            bits[2] = 0;
+            return_value[2] = 0;
             break;
     }
     switch (input) {
@@ -5319,7 +5300,7 @@ uint8_t galois3(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[3] = 1;
+            return_value[3] = 1;
             break;
         case 0:
         case 1:
@@ -5449,7 +5430,7 @@ uint8_t galois3(uint8_t input) {
         case 249:
         case 250:
         case 251:
-            bits[3] = 0;
+            return_value[3] = 0;
             break;
     }
     switch (input) {
@@ -5581,7 +5562,7 @@ uint8_t galois3(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[4] = 1;
+            return_value[4] = 1;
             break;
         case 0:
         case 1:
@@ -5711,7 +5692,7 @@ uint8_t galois3(uint8_t input) {
         case 245:
         case 246:
         case 247:
-            bits[4] = 0;
+            return_value[4] = 0;
             break;
     }
     switch (input) {
@@ -5843,7 +5824,7 @@ uint8_t galois3(uint8_t input) {
         case 237:
         case 238:
         case 239:
-            bits[5] = 1;
+            return_value[5] = 1;
             break;
         case 0:
         case 1:
@@ -5973,7 +5954,7 @@ uint8_t galois3(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[5] = 0;
+            return_value[5] = 0;
             break;
     }
     switch (input) {
@@ -6105,7 +6086,7 @@ uint8_t galois3(uint8_t input) {
         case 221:
         case 222:
         case 223:
-            bits[6] = 1;
+            return_value[6] = 1;
             break;
         case 0:
         case 1:
@@ -6235,7 +6216,7 @@ uint8_t galois3(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[6] = 0;
+            return_value[6] = 0;
             break;
     }
     switch (input) {
@@ -6367,7 +6348,7 @@ uint8_t galois3(uint8_t input) {
         case 189:
         case 190:
         case 191:
-            bits[7] = 1;
+            return_value[7] = 1;
             break;
         case 0:
         case 1:
@@ -6497,11 +6478,8 @@ uint8_t galois3(uint8_t input) {
         case 253:
         case 254:
         case 255:
-            bits[7] = 0;
+            return_value[7] = 0;
             break;
     }
-    return_value = (bits[0] << 0) | (bits[1] << 1) | (bits[2] << 2) |
-                   (bits[3] << 3) | (bits[4] << 4) | (bits[5] << 5) |
-                   (bits[6] << 6) | (bits[7] << 7);
     return return_value;
 }
