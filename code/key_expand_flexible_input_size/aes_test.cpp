@@ -169,3 +169,7 @@ int main()
 
 	return 0;
 }
+
+
+
+//hyperfine 'openssl enc -e -aes-256-ecb -K 603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4 -in testbin/completeWorksOfShakespeare.txt -out shakespeare.bin'
